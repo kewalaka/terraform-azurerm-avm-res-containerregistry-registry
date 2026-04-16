@@ -258,6 +258,10 @@ tokens = {
 }
 ```
 
+### Removed submodules
+
+- **`runs`** and **`private_link_resources`** submodules have been removed. The underlying ARM resources (`Microsoft.ContainerRegistry/registries/runs` and `Microsoft.ContainerRegistry/registries/privateLinkResources`) have entirely read-only `properties` blocks and cannot be created or managed via Terraform's PUT-based resource lifecycle. If you were referencing these variables (`var.runs` or `var.private_link_resources`), remove them from your configuration.
+
 ### New features
 
 - **Day-zero ARM API support** — targets API version `2026-01-01-preview` directly.

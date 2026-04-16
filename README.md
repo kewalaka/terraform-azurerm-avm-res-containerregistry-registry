@@ -729,23 +729,6 @@ Type: `bool`
 
 Default: `true`
 
-### <a name="input_private_link_resources"></a> [private\_link\_resources](#input\_private\_link\_resources)
-
-Description: Map of private link resource instances for the container registry with the following attributes:
-
-**name**  
-The name of the private link resource.
-
-Type:
-
-```hcl
-map(object({
-    name = string
-  }))
-```
-
-Default: `{}`
-
 ### <a name="input_public_network_access"></a> [public\_network\_access](#input\_public\_network\_access)
 
 Description: Specifies whether public network access is permitted for the Container Registry. Possible values are `Enabled` and `Disabled`.
@@ -834,23 +817,6 @@ map(object({
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
     principal_type                         = optional(string, null)
-  }))
-```
-
-Default: `{}`
-
-### <a name="input_runs"></a> [runs](#input\_runs)
-
-Description: Map of run instances for the container registry with the following attributes:
-
-**name**  
-The name of the run resource.
-
-Type:
-
-```hcl
-map(object({
-    name = string
   }))
 ```
 
@@ -1464,21 +1430,9 @@ Source: ./modules/pipeline_runs
 
 Version:
 
-### <a name="module_private_link_resources"></a> [private\_link\_resources](#module\_private\_link\_resources)
-
-Source: ./modules/private_link_resources
-
-Version:
-
 ### <a name="module_replications"></a> [replications](#module\_replications)
 
 Source: ./modules/replications
-
-Version:
-
-### <a name="module_runs"></a> [runs](#module\_runs)
-
-Source: ./modules/runs
 
 Version:
 
