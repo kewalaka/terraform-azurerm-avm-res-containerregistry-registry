@@ -1,0 +1,29 @@
+module "runs" {
+  source   = "./modules/runs"
+  for_each = var.runs
+
+  agent_configuration  = each.value.agent_configuration
+  agent_pool_name      = each.value.agent_pool_name
+  create_time          = each.value.create_time
+  custom_registries    = each.value.custom_registries
+  enable_telemetry     = each.value.enable_telemetry
+  finish_time          = each.value.finish_time
+  image_update_trigger = each.value.image_update_trigger
+  is_archive_enabled   = each.value.is_archive_enabled
+  last_updated_time    = each.value.last_updated_time
+  location             = each.value.location
+  name                 = each.value.name
+  output_images        = each.value.output_images
+  parent_id            = azapi_resource.this.id
+  platform             = each.value.platform
+  provisioning_state   = each.value.provisioning_state
+  run_id               = each.value.run_id
+  run_type             = each.value.run_type
+  source_registry_auth = each.value.source_registry_auth
+  source_trigger       = each.value.source_trigger
+  start_time           = each.value.start_time
+  status               = each.value.status
+  task                 = each.value.task
+  timer_trigger        = each.value.timer_trigger
+  update_trigger_token = each.value.update_trigger_token
+}
