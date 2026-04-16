@@ -244,9 +244,11 @@ scope_maps = {
 
 tokens = {
   reader = {
-    name         = "reader-token"
-    location     = "australiaeast"
-    scope_map_id = module.containerregistry.scope_maps["readonly"].resource_id
+    name     = "reader-token"
+    location = "australiaeast"
+    # Construct the scope map ARM ID directly to avoid a circular reference
+    # (the token is defined in the same module call as the scope map).
+    scope_map_id = "${azurerm_resource_group.this.id}/providers/Microsoft.ContainerRegistry/registries/myregistry/scopeMaps/readonly-scope"
     credentials = {
       passwords = [
         { name = "password1", expiry = "2025-12-31T00:00:00Z" }
@@ -280,9 +282,39 @@ terraform state rm 'module.acr.azurerm_container_registry.this'
 terraform import 'module.acr.azapi_resource.this' \
   '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.ContainerRegistry/registries/myregistry'
 
-# 4. Run plan to verify — expect no destructive changes
+# 4. Migrate child resources — replications
+#    Old: azurerm_container_registry_replication
+#    New: child module using azapi_resource
+terraform state rm 'module.acr.azurerm_container_registry_replication.this["<key>"]'
+terraform import 'module.acr.module.replications["<key>"].azapi_resource.this' \
+  '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.ContainerRegistry/registries/myregistry/replications/<replication_name>'
+
+# 5. Migrate child resources — scope maps
+#    Old: azurerm_container_registry_scope_map
+#    New: child module using azapi_resource
+terraform state rm 'module.acr.azurerm_container_registry_scope_map.this["<key>"]'
+terraform import 'module.acr.module.scope_maps["<key>"].azapi_resource.this' \
+  '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.ContainerRegistry/registries/myregistry/scopeMaps/<scope_map_name>'
+
+# 6. Migrate child resources — tokens
+#    Old: azurerm_container_registry_token
+#    New: child module using azapi_resource
+terraform state rm 'module.acr.azurerm_container_registry_token.this["<key>"]'
+terraform import 'module.acr.module.tokens["<key>"].azapi_resource.this' \
+  '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.ContainerRegistry/registries/myregistry/tokens/<token_name>'
+
+# 7. Migrate child resources — webhooks
+#    Old: azurerm_container_registry_webhook
+#    New: child module using azapi_resource
+terraform state rm 'module.acr.azurerm_container_registry_webhook.this["<key>"]'
+terraform import 'module.acr.module.webhooks["<key>"].azapi_resource.this' \
+  '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.ContainerRegistry/registries/myregistry/webhooks/<webhook_name>'
+
+# 8. Run plan to verify — expect no destructive changes
 terraform plan
 ```
+
+> **Note:** Replace `<key>` with the Terraform map key used in your configuration and `<replication_name>`, `<scope_map_name>`, `<token_name>`, `<webhook_name>` with the actual Azure resource names. Repeat steps 4–7 for each instance of the respective child resource.
 
 ### Output changes
 
@@ -291,7 +323,8 @@ terraform plan
 | `resource_id` | `resource_id` | Unchanged |
 | `name` | `name` | Unchanged |
 | `resource` | `resource` | Now returns `azapi_resource.this` instead of `azurerm_container_registry.this` |
-| `system_assigned_mi_principal_id` | `identity_principal_id` | Renamed, now from AzAPI output |
+| `system_assigned_mi_principal_id` | `system_assigned_mi_principal_id` | Unchanged (now sourced from AzAPI output) |
+| N/A | `identity_principal_id` | New (same value as `system_assigned_mi_principal_id`) |
 | N/A | `identity_tenant_id` | New |
 | N/A | `api_version` | New |
 | N/A | `creation_date` | New |
