@@ -1,12 +1,15 @@
-This submodule manages Azure Container Registry export pipelines (`Microsoft.ContainerRegistry/registries/exportPipelines@2026-01-01-preview`).
+# Azure Container Registry Export Pipelines Module
+
+This module manages export pipelines for transferring artifacts to external storage for an Azure Container Registry.
 
 ## Usage
 
 ```terraform
-module "export_pipelines" {
-  source    = "./modules/export_pipelines"
-  name      = "myExportPipeline"
-  parent_id = azapi_resource.this.id
+module "acr_export_pipelines" {
+  source = "Azure/avm-res-containerregistry-registry/azurerm//modules/export_pipelines"
+
+  name      = "my-export-pipeline"
+  parent_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry"
   location  = "eastus"
   target = {
     key_vault_uri = "https://myvault.vault.azure.net/secrets/mysecret"

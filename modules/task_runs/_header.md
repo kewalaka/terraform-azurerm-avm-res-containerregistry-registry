@@ -1,18 +1,18 @@
-# Task Runs submodule
+# Azure Container Registry Task Runs Module
 
-This submodule manages task runs for an Azure Container Registry (`Microsoft.ContainerRegistry/registries/taskRuns@2025-03-01-preview`).
+This module manages task run operations for executing registry tasks for an Azure Container Registry.
 
 ## Usage
 
-```hcl
-module "task_runs" {
-  source = "./modules/task_runs"
+```terraform
+module "acr_task_runs" {
+  source = "Azure/avm-res-containerregistry-registry/azurerm//modules/task_runs"
 
-  name      = "example-task-run"
-  parent_id = azapi_resource.container_registry.id
+  name      = "my-task-run"
+  parent_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry"
   location  = "eastus"
   run_request = {
-    type          = "DockerBuildRequest"
+    type             = "DockerBuildRequest"
     docker_file_path = "Dockerfile"
     source_location  = "https://github.com/example/repo.git"
     platform = {

@@ -1,19 +1,18 @@
-# Pipeline Runs Submodule
+# Azure Container Registry Pipeline Runs Module
 
-This submodule manages pipeline runs for an Azure Container Registry (`Microsoft.ContainerRegistry/registries/pipelineRuns@2026-01-01-preview`).
+This module manages pipeline run operations for import/export pipelines for an Azure Container Registry.
 
 ## Usage
 
-```hcl
-module "pipeline_runs" {
-  source = "./modules/pipeline_runs"
+```terraform
+module "acr_pipeline_runs" {
+  source = "Azure/avm-res-containerregistry-registry/azurerm//modules/pipeline_runs"
 
-  name      = "example-pipeline-run"
-  parent_id = azapi_resource.registry.id
+  name      = "my-pipeline-run"
+  parent_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry"
   location  = "eastus"
-
   request = {
-    pipeline_resource_id = "/subscriptions/.../importPipelines/example"
+    pipeline_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry/importPipelines/example"
     artifacts            = ["hello-world:latest"]
   }
 }

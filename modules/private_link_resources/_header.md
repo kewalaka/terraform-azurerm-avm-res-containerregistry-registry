@@ -1,15 +1,16 @@
-# Private Link Resources submodule
+# Azure Container Registry Private Link Resources Module
 
-This submodule manages private link resources for an Azure Container Registry (`Microsoft.ContainerRegistry/registries/privateLinkResources@2026-01-01-preview`).
+This module manages private link resources for private endpoint connectivity for an Azure Container Registry.
 
 ## Usage
 
-```hcl
-module "private_link_resources" {
-  source = "./modules/private_link_resources"
+```terraform
+module "acr_private_link_resources" {
+  source = "Azure/avm-res-containerregistry-registry/azurerm//modules/private_link_resources"
 
   name      = "registry"
-  parent_id = azapi_resource.container_registry.id
+  parent_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry"
   location  = "eastus"
+  required_zone_names = ["privatelink.azurecr.io"]
 }
 ```
