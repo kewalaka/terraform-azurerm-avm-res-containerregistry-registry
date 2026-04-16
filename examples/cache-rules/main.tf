@@ -43,10 +43,6 @@ module "containerregistry" {
   location  = azurerm_resource_group.this.location
   name      = module.naming.container_registry.name_unique
   parent_id = azurerm_resource_group.this.id
-  sku = {
-    name = "Premium"
-  }
-
   cache_rules = {
     nginx = {
       name              = "nginx-cache-rule"
@@ -66,5 +62,8 @@ module "containerregistry" {
       source_repository = "mcr.microsoft.com/dotnet/aspnet"
       target_repository = "dotnet/aspnet"
     }
+  }
+  sku = {
+    name = "Premium"
   }
 }

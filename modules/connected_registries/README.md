@@ -149,39 +149,11 @@ object({
 
 Default: `null`
 
-### <a name="input_login_server"></a> [login\_server](#input\_login\_server)
-
-Description: The login server properties of the connected registry.
-
-Type: `object({})`
-
-Default: `null`
-
 ### <a name="input_notifications_list"></a> [notifications\_list](#input\_notifications\_list)
 
 Description: The list of notifications subscription information for the connected registry.
 
 Type: `list(string)`
-
-Default: `null`
-
-### <a name="input_registry_sync_result"></a> [registry\_sync\_result](#input\_registry\_sync\_result)
-
-Description: The result of the connected registry's most recent sync with its parent.
-
-- `last_successful_sync_end_time` - The time that the connected registry's most recent successful sync ended.
-- `last_sync_end_time` - The time that the connected registry's most recent sync ended.
-- `last_sync_start_time` - The time that the connected registry's most recent sync started.
-
-Type:
-
-```hcl
-object({
-    last_successful_sync_end_time = optional(string)
-    last_sync_end_time            = optional(string)
-    last_sync_start_time          = optional(string)
-  })
-```
 
 Default: `null`
 

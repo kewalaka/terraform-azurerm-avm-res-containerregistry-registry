@@ -209,14 +209,8 @@ The garbage collection properties of the connected registry.
 **logging**  
 The logging properties of the connected registry.
 
-**login\_server**  
-The login server properties of the connected registry.
-
 **notifications\_list**  
 The list of notifications subscription information for the connected registry.
-
-**registry\_sync\_result**  
-The result of the connected registry's most recent sync with its parent.
 
 Type:
 
@@ -233,7 +227,6 @@ map(object({
       audit_log_status = optional(any)
       log_level        = optional(any)
     }))
-    login_server       = optional(object({}))
     mode               = any
     name               = string
     notifications_list = optional(list(string))
@@ -246,11 +239,6 @@ map(object({
         token_id    = string
       })
     })
-    registry_sync_result = optional(object({
-      last_successful_sync_end_time = optional(string)
-      last_sync_end_time            = optional(string)
-      last_sync_start_time          = optional(string)
-    }))
   }))
 ```
 
@@ -378,7 +366,7 @@ Default: `null`
 
 ### <a name="input_endpoint_protocol"></a> [endpoint\_protocol](#input\_endpoint\_protocol)
 
-Description: Specifies the connectivity protocol for the registry. Possible values are `IPv4` and `IPv4IPv6` (dual stack). Defaults to `null`.
+Description: Specifies the connectivity protocol for the registry. Possible values are `IPv4` and `IPv4AndIPv6` (dual stack). Defaults to `null`.
 
 Type: `any`
 
@@ -748,23 +736,11 @@ Description: Map of private link resource instances for the container registry w
 **name**  
 The name of the private link resource.
 
-**location**  
-The location of the resource.
-
-**enable\_telemetry**  
-This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
-
-**required\_zone\_names**  
-The private link resource private link DNS zone name.
-
 Type:
 
 ```hcl
 map(object({
-    enable_telemetry    = optional(bool)
-    location            = string
-    name                = string
-    required_zone_names = optional(list(string))
+    name = string
   }))
 ```
 
@@ -825,11 +801,11 @@ Default: `{}`
 
 ### <a name="input_role_assignment_mode"></a> [role\_assignment\_mode](#input\_role\_assignment\_mode)
 
-Description: Determines the registry role assignment mode. Possible values are `RBAC` and `Legacy`.
+Description: Determines the registry role assignment mode. Possible values are `AbacRepositoryPermissions` and `LegacyRegistryPermissions`.
 
 Type: `any`
 
-Default: `null`
+Default: `"AbacRepositoryPermissions"`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
@@ -870,154 +846,11 @@ Description: Map of run instances for the container registry with the following 
 **name**  
 The name of the run resource.
 
-**location**  
-The location of the resource.
-
-**agent\_configuration**  
-The machine configuration of the run agent.
-- `cpu` - The CPU configuration in terms of number of cores required for the run.
-
-**agent\_pool\_name**  
-The dedicated agent pool for the run.
-
-**create\_time**  
-The time the run was scheduled.
-
-**custom\_registries**  
-The list of custom registries that were logged in during this run.
-
-**finish\_time**  
-The time the run finished.
-
-**image\_update\_trigger**  
-The image update trigger that caused the run.
-- `id` - The unique ID of the trigger.
-- `images` - The list of image updates that caused the build.
-  - `digest` - The image digest.
-  - `registry` - The registry of the image.
-  - `repository` - The repository of the image.
-  - `tag` - The tag of the image.
-- `timestamp` - The timestamp when the image update happened.
-
-**is\_archive\_enabled**  
-The value that indicates whether archiving is enabled or not.
-
-**last\_updated\_time**  
-The last updated time for the run.
-
-**output\_images**  
-The list of all images that were generated from the run.
-- `digest` - The image digest.
-- `registry` - The registry of the image.
-- `repository` - The repository of the image.
-- `tag` - The tag of the image.
-
-**platform**  
-The platform properties against which the run will happen.
-- `architecture` - The OS architecture.
-- `os` - The operating system type required for the run.
-- `variant` - Variant of the CPU.
-
-**provisioning\_state**  
-The provisioning state of a run.
-
-**run\_id**  
-The unique identifier for the run.
-
-**run\_type**  
-The type of run.
-
-**source\_registry\_auth**  
-The scope of the credentials that were used to login to the source registry during this run.
-
-**source\_trigger**  
-The source trigger that caused the run.
-- `branch_name` - The branch name in the repository.
-- `commit_id` - The unique ID that identifies a commit.
-- `event_type` - The event type of the trigger.
-- `id` - The unique ID of the trigger.
-- `provider_type` - The source control provider type.
-- `pull_request_id` - The unique ID that identifies pull request.
-- `repository_url` - The repository URL.
-
-**start\_time**  
-The time the run started.
-
-**status**  
-The current status of the run.
-
-**task**  
-The task against which run was scheduled.
-
-**timer\_trigger**  
-The timer trigger that caused the run.
-- `schedule_occurrence` - The occurrence that triggered the run.
-- `timer_trigger_name` - The timer trigger name that caused the run.
-
-**update\_trigger\_token**  
-The update trigger token passed for the Run.
-
-**enable\_telemetry**  
-This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
-
 Type:
 
 ```hcl
 map(object({
-    agent_configuration = optional(object({
-      cpu = optional(number)
-    }))
-    agent_pool_name   = optional(string)
-    create_time       = optional(string)
-    custom_registries = optional(list(string))
-    enable_telemetry  = optional(bool)
-    finish_time       = optional(string)
-    image_update_trigger = optional(object({
-      id = optional(string)
-      images = optional(list(object({
-        digest     = optional(string)
-        registry   = optional(string)
-        repository = optional(string)
-        tag        = optional(string)
-      })))
-      timestamp = optional(string)
-    }))
-    is_archive_enabled = optional(bool)
-    last_updated_time  = optional(string)
-    location           = string
-    name               = string
-    output_images = optional(list(object({
-      digest     = optional(string)
-      registry   = optional(string)
-      repository = optional(string)
-      tag        = optional(string)
-    })))
-    platform = optional(object({
-      architecture = optional(any)
-      os           = any
-      variant      = optional(any)
-    }))
-    provisioning_state   = optional(any)
-    run_id               = optional(string)
-    run_type             = optional(any)
-    source_registry_auth = optional(string)
-    source_trigger = optional(object({
-      branch_name     = optional(string)
-      commit_id       = optional(string)
-      event_type      = optional(string)
-      id              = optional(string)
-      provider_type   = optional(string)
-      pull_request_id = optional(string)
-      repository_url  = optional(string)
-    }))
-    start_time = optional(string)
-    status     = optional(any)
-    task       = optional(string)
-    timer_trigger = optional(object({
-      schedule_occurrence = optional(string)
-      timer_trigger_name  = optional(string)
-    }))
-    update_trigger_token = optional(string)
+    name = string
   }))
 ```
 

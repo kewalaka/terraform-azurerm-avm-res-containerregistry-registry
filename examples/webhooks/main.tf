@@ -46,7 +46,6 @@ module "containerregistry" {
   sku = {
     name = "Premium"
   }
-
   webhooks = {
     push_notification = {
       actions             = ["push"]

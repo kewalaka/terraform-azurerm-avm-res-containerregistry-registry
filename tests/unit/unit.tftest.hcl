@@ -181,10 +181,10 @@ run "webhooks_configuration" {
   variables {
     webhooks = {
       push_webhook = {
-        name        = "pushwebhook"
-        location    = "eastus"
-        service_uri = "https://example.com/webhook"
-        actions     = ["push"]
+        name                = "pushwebhook"
+        location            = "eastus"
+        service_uri         = "https://example.com/webhook"
+        actions             = ["push"]
         service_uri_version = 1
       }
     }

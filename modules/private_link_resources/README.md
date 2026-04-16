@@ -37,12 +37,6 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_location"></a> [location](#input\_location)
-
-Description: The location of the resource.
-
-Type: `string`
-
 ### <a name="input_name"></a> [name](#input\_name)
 
 Description: The name of the resource.
@@ -57,23 +51,7 @@ Type: `string`
 
 ## Optional Inputs
 
-The following input variables are optional (have default values):
-
-### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
-
-Description: This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
-
-Type: `bool`
-
-Default: `true`
-
-### <a name="input_required_zone_names"></a> [required\_zone\_names](#input\_required\_zone\_names)
-
-Description: The private link resource private link DNS zone name.
-
-Type: `list(string)`
-
-Default: `null`
+No optional inputs.
 
 ## Outputs
 
