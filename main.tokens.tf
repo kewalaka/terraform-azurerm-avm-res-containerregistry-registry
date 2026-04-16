@@ -9,4 +9,6 @@ module "tokens" {
   enable_telemetry = each.value.enable_telemetry
   scope_map_id     = each.value.scope_map_id
   status           = each.value.status
+
+  depends_on = [module.scope_maps]
 }
