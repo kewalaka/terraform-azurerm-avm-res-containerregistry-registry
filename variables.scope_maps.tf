@@ -1,4 +1,12 @@
 variable "scope_maps" {
+  type = map(object({
+    actions          = list(string)
+    description      = optional(string)
+    enable_telemetry = optional(bool)
+    location         = string
+    name             = string
+  }))
+  default     = {}
   description = <<DESCRIPTION
 Map of instances for the submodule with the following attributes:
 
@@ -19,12 +27,4 @@ This variable controls whether or not telemetry is enabled for the module. For m
 **name**
 The name of the resource.
 DESCRIPTION
-  type = map(object({
-    actions          = list(string)
-    description      = optional(string)
-    enable_telemetry = optional(bool)
-    location         = string
-    name             = string
-  }))
-  default = {}
 }

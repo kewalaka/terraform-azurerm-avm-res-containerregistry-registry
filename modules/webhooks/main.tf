@@ -1,9 +1,14 @@
 resource "azapi_resource" "this" {
-  type      = "Microsoft.ContainerRegistry/registries/webhooks@2026-01-01-preview"
+  location  = var.location
   name      = var.name
   parent_id = var.parent_id
-  location  = var.location
+  type      = "Microsoft.ContainerRegistry/registries/webhooks@2026-01-01-preview"
   body      = local.resource_body
+  response_export_values = [
+    "apiVersion",
+    "systemData",
+    "type"
+  ]
   sensitive_body = {
     properties = {
       customHeaders = var.custom_headers
@@ -15,9 +20,4 @@ resource "azapi_resource" "this" {
     "properties.serviceUri"    = var.service_uri_version
   }
   tags = var.tags
-  response_export_values = [
-    "apiVersion",
-    "systemData",
-    "type"
-  ]
 }

@@ -1,4 +1,18 @@
 variable "webhooks" {
+  type = map(object({
+    actions                = list(any)
+    custom_headers         = optional(map(string))
+    custom_headers_version = optional(number)
+    enable_telemetry       = optional(bool)
+    location               = string
+    name                   = string
+    scope                  = optional(string)
+    service_uri            = string
+    service_uri_version    = optional(number)
+    status                 = optional(any)
+    tags                   = optional(map(string))
+  }))
+  default     = {}
   description = <<DESCRIPTION
 Map of instances for the submodule with the following attributes:
 
@@ -35,18 +49,4 @@ The status of the webhook at the time the operation was called.
 **custom_headers_version**
 Version tracker for custom_headers. Must be set when custom_headers is provided.
 DESCRIPTION
-  type = map(object({
-    actions                = list(any)
-    custom_headers         = optional(map(string))
-    custom_headers_version = optional(number)
-    enable_telemetry       = optional(bool)
-    location               = string
-    name                   = string
-    scope                  = optional(string)
-    service_uri            = string
-    service_uri_version    = optional(number)
-    status                 = optional(any)
-    tags                   = optional(map(string))
-  }))
-  default = {}
 }

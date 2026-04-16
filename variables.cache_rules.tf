@@ -1,4 +1,17 @@
 variable "cache_rules" {
+  type = map(object({
+    credential_set_resource_id = optional(string)
+    enable_telemetry           = optional(bool)
+    location                   = string
+    managed_identities = optional(object({
+      system_assigned            = optional(bool, false)
+      user_assigned_resource_ids = optional(set(string), [])
+    }))
+    name              = string
+    source_repository = optional(string)
+    target_repository = optional(string)
+  }))
+  default     = {}
   description = <<DESCRIPTION
 Map of instances for the submodule with the following attributes:
 
@@ -24,17 +37,4 @@ Controls the Managed Identity configuration on this resource.
 **credential_set_resource_id**
 The ARM resource ID of the credential store which is associated with the cache rule.
 DESCRIPTION
-  type = map(object({
-    credential_set_resource_id = optional(string)
-    enable_telemetry           = optional(bool)
-    location                   = string
-    managed_identities = optional(object({
-      system_assigned            = optional(bool, false)
-      user_assigned_resource_ids = optional(set(string), [])
-    }))
-    name              = string
-    source_repository = optional(string)
-    target_repository = optional(string)
-  }))
-  default = {}
 }

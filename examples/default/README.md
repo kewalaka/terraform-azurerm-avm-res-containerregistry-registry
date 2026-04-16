@@ -6,15 +6,21 @@ This deploys the Container Registry module using default settings.
 
 ```hcl
 terraform {
-  required_version = "~> 1.6"
+  required_version = "~> 1.12"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.7"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 4, < 5.0.0"
     }
   }
 }
+
+provider "azapi" {}
 
 provider "azurerm" {
   skip_provider_registration = true
@@ -41,10 +47,12 @@ resource "azurerm_resource_group" "this" {
 module "containerregistry" {
   source = "../../"
 
-  location = azurerm_resource_group.this.location
-  # source             = "Azure/avm-containerregistry-registry/azurerm"
-  name                = module.naming.container_registry.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+  location  = azurerm_resource_group.this.location
+  name      = module.naming.container_registry.name_unique
+  parent_id = azurerm_resource_group.this.id
+  sku = {
+    name = "Premium"
+  }
 }
 ```
 
@@ -53,7 +61,9 @@ module "containerregistry" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.12)
+
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.7)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4, < 5.0.0)
 

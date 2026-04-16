@@ -1,26 +1,6 @@
-output "resource_id" {
-  description = "The ID of the created resource."
-  value       = azapi_resource.this.id
-}
-
-output "name" {
-  description = "The name of the created resource."
-  value       = azapi_resource.this.name
-}
-
 output "api_version" {
   description = "The resource api version"
   value       = try(azapi_resource.this.output.apiVersion, null)
-}
-
-output "identity_principal_id" {
-  description = "The principal ID of resource identity."
-  value       = try(azapi_resource.this.output.identity.principalId, null)
-}
-
-output "identity_tenant_id" {
-  description = "The tenant ID of resource."
-  value       = try(azapi_resource.this.output.identity.tenantId, null)
 }
 
 output "creation_date" {
@@ -43,9 +23,24 @@ output "encryption_key_vault_properties_versioned_key_identifier" {
   value       = try(azapi_resource.this.output.properties.encryption.keyVaultProperties.versionedKeyIdentifier, null)
 }
 
+output "identity_principal_id" {
+  description = "The principal ID of resource identity."
+  value       = try(azapi_resource.this.output.identity.principalId, null)
+}
+
+output "identity_tenant_id" {
+  description = "The tenant ID of resource."
+  value       = try(azapi_resource.this.output.identity.tenantId, null)
+}
+
 output "login_server" {
   description = "The URL that can be used to log into the container registry."
   value       = try(azapi_resource.this.output.properties.loginServer, null)
+}
+
+output "name" {
+  description = "The name of the created resource."
+  value       = azapi_resource.this.name
 }
 
 output "policies_retention_policy_last_updated_time" {
@@ -63,14 +58,43 @@ output "private_endpoint_connections" {
   value       = try(azapi_resource.this.output.properties.privateEndpointConnections, [])
 }
 
+output "private_endpoints" {
+  description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
+  value       = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
+}
+
 output "regional_endpoint_host_names" {
   description = "List of host names that will serve registry when RegionalEndpoints is enabled."
   value       = try(azapi_resource.this.output.properties.regionalEndpointHostNames, [])
 }
 
+# Module owners should include the full resource via a 'resource' output
+# https://azure.github.io/Azure-Verified-Modules/specs/terraform/#id-tffr2---category-outputs---additional-terraform-outputs
+output "resource" {
+  description = "This is the full output for the resource."
+  value       = azapi_resource.this
+}
+
+output "resource_id" {
+  description = "The ID of the created resource."
+  value       = azapi_resource.this.id
+}
+
+output "scope_maps" {
+  description = <<DESCRIPTION
+A map of scope maps. The map key is the supplied input to var.scope_maps. The map value is the entire scope map module.
+DESCRIPTION
+  value       = module.scope_maps
+}
+
 output "status" {
   description = "The status of the container registry at the time the operation was called."
   value       = try(azapi_resource.this.output.properties.status, {})
+}
+
+output "system_assigned_mi_principal_id" {
+  description = "The system assigned managed identity principal ID of the parent resource."
+  value       = try(azapi_resource.this.output.identity.principalId, null)
 }
 
 output "system_data" {
@@ -82,28 +106,3 @@ output "type" {
   description = "The resource type"
   value       = try(azapi_resource.this.output.type, null)
 }
-
-# Module owners should include the full resource via a 'resource' output
-# https://azure.github.io/Azure-Verified-Modules/specs/terraform/#id-tffr2---category-outputs---additional-terraform-outputs
-output "resource" {
-  description = "This is the full output for the resource."
-  value       = azapi_resource.this
-}
-
-output "private_endpoints" {
-  description = "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource."
-  value       = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
-}
-
-output "scope_maps" {
-  description = <<DESCRIPTION
-A map of scope maps. The map key is the supplied input to var.scope_maps. The map value is the entire scope map module.
-DESCRIPTION
-  value       = module.scope_maps
-}
-
-output "system_assigned_mi_principal_id" {
-  description = "The system assigned managed identity principal ID of the parent resource."
-  value       = try(azapi_resource.this.output.identity.principalId, null)
-}
-

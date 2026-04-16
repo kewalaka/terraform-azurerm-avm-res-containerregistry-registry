@@ -1,4 +1,13 @@
 variable "replications" {
+  type = map(object({
+    enable_telemetry        = optional(bool)
+    location                = string
+    name                    = string
+    region_endpoint_enabled = optional(bool)
+    tags                    = optional(map(string))
+    zone_redundancy         = optional(any)
+  }))
+  default     = {}
   description = <<DESCRIPTION
 Map of instances for the submodule with the following attributes:
 
@@ -20,13 +29,4 @@ Whether or not zone redundancy is enabled for this container registry replicatio
 **enable_telemetry**
 This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
 DESCRIPTION
-  type = map(object({
-    enable_telemetry        = optional(bool)
-    location                = string
-    name                    = string
-    region_endpoint_enabled = optional(bool)
-    tags                    = optional(map(string))
-    zone_redundancy         = optional(any)
-  }))
-  default = {}
 }
