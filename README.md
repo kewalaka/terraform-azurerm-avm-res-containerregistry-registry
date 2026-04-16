@@ -775,7 +775,7 @@ The following Modules are called:
 
 Source: git::https://github.com/Azure/terraform-azure-avm-utl-interfaces.git
 
-Version: feat/prepv1
+Version: 19a5b81629958a553b8593be5ca52fb729011f65
 
 ### <a name="module_cache_rules"></a> [cache\_rules](#module\_cache\_rules)
 
