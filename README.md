@@ -63,43 +63,74 @@ Description: The parent resource ID for this resource.
 
 Type: `string`
 
-### <a name="input_sku"></a> [sku](#input\_sku)
-
-Description: The SKU of the container registry.
-
-- `name` - The SKU name of the container registry. Required for registry creation.
-
-Type:
-
-```hcl
-object({
-    name = any
-  })
-```
-
 ## Optional Inputs
 
 The following input variables are optional (have default values):
 
 ### <a name="input_admin_user_enabled"></a> [admin\_user\_enabled](#input\_admin\_user\_enabled)
 
-Description: The value that indicates whether the admin user is enabled.
+Description: Specifies whether the admin user is enabled. Defaults to `false`. The admin account is a single user account with admin access to the registry, avoid using this for production workloads.
 
 Type: `bool`
 
-Default: `null`
+Default: `false`
+
+### <a name="input_agent_pools"></a> [agent\_pools](#input\_agent\_pools)
+
+Description: Map of instances for the submodule with the following attributes:
+
+**name**  
+The name of the resource.
+
+**location**  
+The location of the resource.
+
+**agent\_count**  
+The count of agent machine.
+
+**os**  
+The OS of agent machine.
+
+**tier**  
+The Tier of agent machine.
+
+**virtual\_network\_subnet\_resource\_id**  
+The Virtual Network Subnet Resource Id of the agent machine.
+
+**tags**
+(Optional) Tags of the resource.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+Type:
+
+```hcl
+map(object({
+    agent_count                        = optional(number)
+    enable_telemetry                   = optional(bool)
+    location                           = string
+    name                               = string
+    os                                 = optional(any)
+    tags                               = optional(map(string))
+    tier                               = optional(string)
+    virtual_network_subnet_resource_id = optional(string)
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_anonymous_pull_enabled"></a> [anonymous\_pull\_enabled](#input\_anonymous\_pull\_enabled)
 
-Description: Enables registry-wide pull from unauthenticated clients.
+Description: Specifies whether anonymous (unauthenticated) pull access to this Container Registry is allowed. Requires Standard or Premium SKU. Defaults to `false`.
 
 Type: `bool`
 
-Default: `null`
+Default: `false`
 
 ### <a name="input_auto_generated_domain_name_label_scope"></a> [auto\_generated\_domain\_name\_label\_scope](#input\_auto\_generated\_domain\_name\_label\_scope)
 
-Description: Determines the domain name label reuse scope.
+Description: Determines the domain name label reuse scope. Possible values include `TenantReuse`, `SubscriptionReuse`, `ResourceGroupReuse`, `NoReuse`, and `Unsecure`.
 
 Type: `any`
 
@@ -150,13 +181,133 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_connected_registries"></a> [connected\_registries](#input\_connected\_registries)
+
+Description: Map of instances for the submodule with the following attributes:
+
+**name**  
+The name of the resource.
+
+**location**  
+The location of the resource.
+
+**mode**  
+The mode of the connected registry resource that indicates the permissions of the registry.
+
+**parent**  
+The parent of the connected registry.
+
+**client\_token\_ids**  
+The list of the ACR token resource IDs used to authenticate clients to the connected registry.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+**garbage\_collection**  
+The garbage collection properties of the connected registry.
+
+**logging**  
+The logging properties of the connected registry.
+
+**login\_server**  
+The login server properties of the connected registry.
+
+**notifications\_list**  
+The list of notifications subscription information for the connected registry.
+
+**registry\_sync\_result**  
+The result of the connected registry's most recent sync with its parent.
+
+Type:
+
+```hcl
+map(object({
+    client_token_ids = optional(list(string))
+    enable_telemetry = optional(bool)
+    garbage_collection = optional(object({
+      enabled  = optional(bool)
+      schedule = optional(string)
+    }))
+    location = string
+    logging = optional(object({
+      audit_log_status = optional(any)
+      log_level        = optional(any)
+    }))
+    login_server       = optional(object({}))
+    mode               = any
+    name               = string
+    notifications_list = optional(list(string))
+    parent = object({
+      id = optional(string)
+      sync_properties = object({
+        message_ttl = string
+        schedule    = optional(string)
+        sync_window = optional(string)
+        token_id    = string
+      })
+    })
+    registry_sync_result = optional(object({
+      last_successful_sync_end_time = optional(string)
+      last_sync_end_time            = optional(string)
+      last_sync_start_time          = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_credential_sets"></a> [credential\_sets](#input\_credential\_sets)
+
+Description: Map of instances for the submodule with the following attributes:
+
+**name**  
+The name of the resource.
+
+**location**  
+The location of the resource.
+
+**auth\_credentials**  
+List of authentication credentials stored for an upstream.  
+Usually consists of a primary and an optional secondary credential.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+**login\_server**  
+The credentials are stored for this upstream or login server.
+
+**managed\_identities**  
+Controls the Managed Identity configuration on this resource.
+
+Type:
+
+```hcl
+map(object({
+    auth_credentials = optional(list(object({
+      name                       = optional(any)
+      password_secret_identifier = optional(string)
+      username_secret_identifier = optional(string)
+    })))
+    enable_telemetry = optional(bool)
+    location         = string
+    login_server     = optional(string)
+    managed_identities = optional(object({
+      system_assigned            = optional(bool, false)
+      user_assigned_resource_ids = optional(set(string), [])
+    }))
+    name = string
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_data_endpoint_enabled"></a> [data\_endpoint\_enabled](#input\_data\_endpoint\_enabled)
 
-Description: Enable a single data endpoint per region for serving data.
+Description: Specifies whether to enable dedicated data endpoints for this Container Registry. Requires Premium SKU. Defaults to `false`.
 
 Type: `bool`
 
-Default: `null`
+Default: `false`
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
@@ -204,12 +355,12 @@ Default: `true`
 
 ### <a name="input_encryption"></a> [encryption](#input\_encryption)
 
-Description: The encryption settings of container registry.
+Description: The encryption settings for the Container Registry using a customer-managed key. Requires Premium SKU.
 
-- `key_vault_properties` - Key vault properties.
-  - `identity` - The client id of the identity which will be used to access key vault.
-  - `key_identifier` - Key vault uri to access the encryption key.
-- `status` - Indicates whether or not the encryption is enabled for container registry.
+- `key_vault_properties` - (Optional) Key vault properties for the encryption key.
+  - `identity` - (Optional) The client ID of the managed identity used to access the key vault.
+  - `key_identifier` - (Optional) The full URI of the encryption key in the key vault, e.g. `https://myvault.vault.azure.net/keys/mykey/myversion`.
+- `status` - (Optional) Indicates whether encryption is enabled. Possible values are `enabled` and `disabled`.
 
 Type:
 
@@ -227,11 +378,119 @@ Default: `null`
 
 ### <a name="input_endpoint_protocol"></a> [endpoint\_protocol](#input\_endpoint\_protocol)
 
-Description: The connectivity protocol for the registry, such as IPv4 or dual stack (IPv4 and IPv6).
+Description: Specifies the connectivity protocol for the registry. Possible values are `IPv4` and `IPv4IPv6` (dual stack). Defaults to `null`.
 
 Type: `any`
 
 Default: `null`
+
+### <a name="input_export_pipelines"></a> [export\_pipelines](#input\_export\_pipelines)
+
+Description: Map of instances for the submodule with the following attributes:
+
+**name**  
+The name of the resource.
+
+**location**  
+The location of the resource.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+**managed\_identities**  
+Controls the Managed Identity configuration on this resource.
+
+**options**  
+The list of all options configured for the pipeline.
+
+**target**  
+The target properties of the export pipeline.
+- `key_vault_uri` - The key vault secret uri to obtain the target storage SAS token.
+- `storage_access_mode` - The storage access mode used for the customer storage account.
+- `type` - The type of target for the export pipeline.
+- `uri` - The target uri of the export pipeline. When 'AzureStorageBlob': "https://accountName.blob.core.windows.net/containerName/blobName" When 'AzureStorageBlobContainer': "https://accountName.blob.core.windows.net/containerName"
+
+Type:
+
+```hcl
+map(object({
+    enable_telemetry = optional(bool)
+    location         = string
+    managed_identities = optional(object({
+      system_assigned            = optional(bool, false)
+      user_assigned_resource_ids = optional(set(string), [])
+    }))
+    name    = string
+    options = optional(list(any))
+    target = object({
+      key_vault_uri       = optional(string)
+      storage_access_mode = optional(any)
+      type                = optional(string)
+      uri                 = optional(string)
+    })
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_import_pipelines"></a> [import\_pipelines](#input\_import\_pipelines)
+
+Description: Map of instances for the submodule with the following attributes:
+
+**name**  
+The name of the resource.
+
+**location**  
+The location of the resource.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+**managed\_identities**  
+Controls the Managed Identity configuration on this resource.
+
+**options**  
+The list of all options configured for the pipeline.
+
+**pipeline\_source**  
+The source properties of the import pipeline.
+- `key_vault_uri` - The key vault secret uri to obtain the source storage SAS token.
+- `storage_access_mode` - The storage access mode used for the customer storage account.
+- `type` - The type of source for the import pipeline.
+- `uri` - The source uri of the import pipeline. When 'AzureStorageBlob': "https://accountName.blob.core.windows.net/containerName/blobName" When 'AzureStorageBlobContainer': "https://accountName.blob.core.windows.net/containerName"
+
+**trigger**  
+The properties that describe the trigger of the import pipeline.
+- `source_trigger` - The source trigger properties of the pipeline.
+  - `status` - The current status of the source trigger.
+
+Type:
+
+```hcl
+map(object({
+    enable_telemetry = optional(bool)
+    location         = string
+    managed_identities = optional(object({
+      system_assigned            = optional(bool, false)
+      user_assigned_resource_ids = optional(set(string), [])
+    }))
+    name    = string
+    options = optional(list(any))
+    pipeline_source = object({
+      key_vault_uri       = optional(string)
+      storage_access_mode = optional(any)
+      type                = optional(any)
+      uri                 = optional(string)
+    })
+    trigger = optional(object({
+      source_trigger = optional(object({
+        status = any
+      }))
+    }))
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
@@ -268,7 +527,7 @@ Default: `{}`
 
 ### <a name="input_metadata_search"></a> [metadata\_search](#input\_metadata\_search)
 
-Description: Determines whether registry artifacts are indexed for metadata search.
+Description: Specifies whether registry artifacts are indexed for metadata search. Possible values are `Enabled` and `Disabled`. Requires Premium SKU.
 
 Type: `any`
 
@@ -276,7 +535,7 @@ Default: `null`
 
 ### <a name="input_network_rule_bypass_allowed_for_tasks"></a> [network\_rule\_bypass\_allowed\_for\_tasks](#input\_network\_rule\_bypass\_allowed\_for\_tasks)
 
-Description: Whether or not Tasks allowed to bypass the network rules for this container registry.
+Description: Specifies whether to allow trusted Azure Services to access a network restricted Container Registry for tasks such as image build. Defaults to `null`.
 
 Type: `bool`
 
@@ -284,18 +543,20 @@ Default: `null`
 
 ### <a name="input_network_rule_bypass_options"></a> [network\_rule\_bypass\_options](#input\_network\_rule\_bypass\_options)
 
-Description: Whether to allow trusted Azure services to access a network restricted registry.
+Description: Specifies whether to allow trusted Azure services access to a network restricted Container Registry. Possible values are `None` and `AzureServices`. Defaults to `None`.
 
 Type: `any`
 
-Default: `null`
+Default: `"None"`
 
 ### <a name="input_network_rule_set"></a> [network\_rule\_set](#input\_network\_rule\_set)
 
-Description: The network rule set for a container registry.
+Description: The network rule set configuration for the Container Registry. Requires Premium SKU.
 
-- `default_action` - The default action of allow or deny when no other rules match.
-- `ip_rules` - The IP ACL rules.
+- `default_action` - (Required) The default action when no other rules match. Possible values are `Allow` and `Deny`.
+- `ip_rules` - (Optional) A list of IP ACL rules.
+  - `action` - (Optional) The action of the IP rule. Only `Allow` is permitted.
+  - `value` - (Required) The CIDR block from which requests will match the rule.
 
 Type:
 
@@ -311,9 +572,63 @@ object({
 
 Default: `null`
 
+### <a name="input_pipeline_runs"></a> [pipeline\_runs](#input\_pipeline\_runs)
+
+Description: Map of pipeline run instances for the container registry with the following attributes:
+
+**name**  
+The name of the pipeline run resource.
+
+**location**  
+The location of the resource.
+
+**force\_update\_tag**  
+How the pipeline run should be forced to recreate even if the pipeline run configuration has not changed.
+
+**request**  
+The request parameters for a pipeline run.
+- `artifacts` - List of source artifacts to be transferred by the pipeline.
+- `catalog_digest` - The digest of the tar used to transfer the artifacts.
+- `pipeline_resource_id` - The resource ID of the pipeline to run.
+- `source` - The source properties of the pipeline run.
+  - `name` - The name of the source.
+  - `type` - The type of the source.
+- `target` - The target properties of the pipeline run.
+  - `name` - The name of the target.
+  - `type` - The type of the target.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+Type:
+
+```hcl
+map(object({
+    enable_telemetry = optional(bool)
+    force_update_tag = optional(string)
+    location         = string
+    name             = string
+    request = optional(object({
+      artifacts            = optional(list(string))
+      catalog_digest       = optional(string)
+      pipeline_resource_id = optional(string)
+      source = optional(object({
+        name = optional(string)
+        type = optional(any)
+      }))
+      target = optional(object({
+        name = optional(string)
+        type = optional(any)
+      }))
+    }))
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_policies"></a> [policies](#input\_policies)
 
-Description: The policies for a container registry.
+Description: The policies for the Container Registry. All sub-policies require Premium SKU.
 
 - `azure_ad_authentication_as_arm_policy` - The policy for using Azure Resource Manager audience token for a container registry.
   - `status` - The value that indicates whether the policy is enabled or not.
@@ -426,9 +741,38 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_private_link_resources"></a> [private\_link\_resources](#input\_private\_link\_resources)
+
+Description: Map of private link resource instances for the container registry with the following attributes:
+
+**name**  
+The name of the private link resource.
+
+**location**  
+The location of the resource.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+**required\_zone\_names**  
+The private link resource private link DNS zone name.
+
+Type:
+
+```hcl
+map(object({
+    enable_telemetry    = optional(bool)
+    location            = string
+    name                = string
+    required_zone_names = optional(list(string))
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_public_network_access"></a> [public\_network\_access](#input\_public\_network\_access)
 
-Description: Whether or not public network access is allowed for the container registry.
+Description: Specifies whether public network access is permitted for the Container Registry. Possible values are `Enabled` and `Disabled`.
 
 Type: `any`
 
@@ -436,7 +780,7 @@ Default: `null`
 
 ### <a name="input_regional_endpoints"></a> [regional\_endpoints](#input\_regional\_endpoints)
 
-Description: Enable per-region endpoints for accessing registry.
+Description: Specifies whether per-region endpoints are enabled for accessing the registry. Possible values are `Enabled` and `Disabled`.
 
 Type: `any`
 
@@ -481,7 +825,7 @@ Default: `{}`
 
 ### <a name="input_role_assignment_mode"></a> [role\_assignment\_mode](#input\_role\_assignment\_mode)
 
-Description: Determines registry role assignment mode.
+Description: Determines the registry role assignment mode. Possible values are `RBAC` and `Legacy`.
 
 Type: `any`
 
@@ -514,6 +858,166 @@ map(object({
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
     principal_type                         = optional(string, null)
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_runs"></a> [runs](#input\_runs)
+
+Description: Map of run instances for the container registry with the following attributes:
+
+**name**  
+The name of the run resource.
+
+**location**  
+The location of the resource.
+
+**agent\_configuration**  
+The machine configuration of the run agent.
+- `cpu` - The CPU configuration in terms of number of cores required for the run.
+
+**agent\_pool\_name**  
+The dedicated agent pool for the run.
+
+**create\_time**  
+The time the run was scheduled.
+
+**custom\_registries**  
+The list of custom registries that were logged in during this run.
+
+**finish\_time**  
+The time the run finished.
+
+**image\_update\_trigger**  
+The image update trigger that caused the run.
+- `id` - The unique ID of the trigger.
+- `images` - The list of image updates that caused the build.
+  - `digest` - The image digest.
+  - `registry` - The registry of the image.
+  - `repository` - The repository of the image.
+  - `tag` - The tag of the image.
+- `timestamp` - The timestamp when the image update happened.
+
+**is\_archive\_enabled**  
+The value that indicates whether archiving is enabled or not.
+
+**last\_updated\_time**  
+The last updated time for the run.
+
+**output\_images**  
+The list of all images that were generated from the run.
+- `digest` - The image digest.
+- `registry` - The registry of the image.
+- `repository` - The repository of the image.
+- `tag` - The tag of the image.
+
+**platform**  
+The platform properties against which the run will happen.
+- `architecture` - The OS architecture.
+- `os` - The operating system type required for the run.
+- `variant` - Variant of the CPU.
+
+**provisioning\_state**  
+The provisioning state of a run.
+
+**run\_id**  
+The unique identifier for the run.
+
+**run\_type**  
+The type of run.
+
+**source\_registry\_auth**  
+The scope of the credentials that were used to login to the source registry during this run.
+
+**source\_trigger**  
+The source trigger that caused the run.
+- `branch_name` - The branch name in the repository.
+- `commit_id` - The unique ID that identifies a commit.
+- `event_type` - The event type of the trigger.
+- `id` - The unique ID of the trigger.
+- `provider_type` - The source control provider type.
+- `pull_request_id` - The unique ID that identifies pull request.
+- `repository_url` - The repository URL.
+
+**start\_time**  
+The time the run started.
+
+**status**  
+The current status of the run.
+
+**task**  
+The task against which run was scheduled.
+
+**timer\_trigger**  
+The timer trigger that caused the run.
+- `schedule_occurrence` - The occurrence that triggered the run.
+- `timer_trigger_name` - The timer trigger name that caused the run.
+
+**update\_trigger\_token**  
+The update trigger token passed for the Run.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+Type:
+
+```hcl
+map(object({
+    agent_configuration = optional(object({
+      cpu = optional(number)
+    }))
+    agent_pool_name   = optional(string)
+    create_time       = optional(string)
+    custom_registries = optional(list(string))
+    enable_telemetry  = optional(bool)
+    finish_time       = optional(string)
+    image_update_trigger = optional(object({
+      id = optional(string)
+      images = optional(list(object({
+        digest     = optional(string)
+        registry   = optional(string)
+        repository = optional(string)
+        tag        = optional(string)
+      })))
+      timestamp = optional(string)
+    }))
+    is_archive_enabled = optional(bool)
+    last_updated_time  = optional(string)
+    location           = string
+    name               = string
+    output_images = optional(list(object({
+      digest     = optional(string)
+      registry   = optional(string)
+      repository = optional(string)
+      tag        = optional(string)
+    })))
+    platform = optional(object({
+      architecture = optional(any)
+      os           = any
+      variant      = optional(any)
+    }))
+    provisioning_state   = optional(any)
+    run_id               = optional(string)
+    run_type             = optional(any)
+    source_registry_auth = optional(string)
+    source_trigger = optional(object({
+      branch_name     = optional(string)
+      commit_id       = optional(string)
+      event_type      = optional(string)
+      id              = optional(string)
+      provider_type   = optional(string)
+      pull_request_id = optional(string)
+      repository_url  = optional(string)
+    }))
+    start_time = optional(string)
+    status     = optional(any)
+    task       = optional(string)
+    timer_trigger = optional(object({
+      schedule_occurrence = optional(string)
+      timer_trigger_name  = optional(string)
+    }))
+    update_trigger_token = optional(string)
   }))
 ```
 
@@ -554,6 +1058,28 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_sku"></a> [sku](#input\_sku)
+
+Description: The SKU of the Container Registry. Default is `Premium`.
+
+- `name` - (Required) The SKU name of the Container Registry. Possible values are `Basic`, `Standard` and `Premium`.
+
+Type:
+
+```hcl
+object({
+    name = string
+  })
+```
+
+Default:
+
+```json
+{
+  "name": "Premium"
+}
+```
+
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
 Description: (Optional) Tags of the resource.
@@ -561,6 +1087,292 @@ Description: (Optional) Tags of the resource.
 Type: `map(string)`
 
 Default: `null`
+
+### <a name="input_task_runs"></a> [task\_runs](#input\_task\_runs)
+
+Description: Map of task run instances for the container registry with the following attributes:
+
+**name**  
+The name of the task run resource.
+
+**location**  
+The location of the resource.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+**force\_update\_tag**  
+How the run should be forced to rerun even if the run request configuration has not changed.
+
+**managed\_identities**  
+Controls the Managed Identity configuration on this resource.
+- `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
+- `user_assigned_resource_ids` - (Optional) Specifies a set of User Assigned Managed Identity resource IDs to be assigned.
+
+**run\_request**  
+The request (parameters) for the run.
+- `agent_configuration` - The machine configuration of the run agent.
+  - `cpu` - The CPU configuration in terms of number of cores required for the run.
+- `agent_pool_name` - The dedicated agent pool for the run.
+- `arguments` - The collection of override arguments to be used when executing the run.
+- `credentials` - The properties that describe a set of credentials that will be used when this run is invoked.
+  - `custom_registries` - Describes the credential parameters for accessing other custom registries.
+  - `source_registry` - Describes the credential parameters for accessing the source registry.
+- `docker_file_path` - The Docker file path relative to the source location.
+- `encoded_task_content` - Base64 encoded value of the template/definition file content.
+- `encoded_values_content` - Base64 encoded value of the parameters/values file content.
+- `image_names` - The fully qualified image names including the repository and tag.
+- `is_archive_enabled` - Whether archiving is enabled for the run.
+- `is_push_enabled` - Whether the image built should be pushed to the registry.
+- `log_template` - The template that describes the repository and tag information for run log artifact.
+- `no_cache` - Whether the image cache is enabled.
+- `override_task_step_properties` - Set of overridable parameters that can be passed when running a Task.
+- `platform` - The platform properties against which the run has to happen.
+- `source_location` - The URL (absolute or relative) of the source context.
+- `target` - The name of the target build stage for the docker build.
+- `task_file_path` - The template/definition file path relative to the source.
+- `task_id` - The resource ID of task against which run has to be queued.
+- `timeout` - Run timeout in seconds (300-28800).
+- `type` - The type of run request. One of: DockerBuildRequest, EncodedTaskRunRequest, FileTaskRunRequest, TaskRunRequest.
+- `values` - The collection of overridable values that can be passed when running a task.
+- `values_file_path` - The values/parameters file path relative to the source.
+
+Type:
+
+```hcl
+map(object({
+    enable_telemetry = optional(bool)
+    force_update_tag = optional(string)
+    location         = string
+    managed_identities = optional(object({
+      system_assigned            = optional(bool, false)
+      user_assigned_resource_ids = optional(set(string), [])
+    }))
+    name = string
+    run_request = optional(object({
+      agent_configuration = optional(object({
+        cpu = optional(number)
+      }))
+      agent_pool_name = optional(string)
+      arguments = optional(list(object({
+        is_secret = optional(bool)
+        name      = string
+        value     = string
+      })))
+      credentials = optional(object({
+        custom_registries = optional(map(object({
+          identity = optional(string)
+          password = optional(object({
+            type  = optional(any)
+            value = optional(string)
+          }))
+          user_name = optional(object({
+            type  = optional(any)
+            value = optional(string)
+          }))
+        })))
+        source_registry = optional(object({
+          identity   = optional(string)
+          login_mode = optional(any)
+        }))
+      }))
+      docker_file_path       = optional(string)
+      encoded_task_content   = optional(string)
+      encoded_values_content = optional(string)
+      image_names            = optional(list(string))
+      is_archive_enabled     = optional(bool)
+      is_push_enabled        = optional(bool)
+      log_template           = optional(string)
+      no_cache               = optional(bool)
+      override_task_step_properties = optional(object({
+        arguments = optional(list(object({
+          is_secret = optional(bool)
+          name      = string
+          value     = string
+        })))
+        context_path         = optional(string)
+        file                 = optional(string)
+        target               = optional(string)
+        update_trigger_token = optional(string)
+        values = optional(list(object({
+          is_secret = optional(bool)
+          name      = string
+          value     = string
+        })))
+      }))
+      platform = optional(object({
+        architecture = optional(any)
+        os           = any
+        variant      = optional(any)
+      }))
+      source_location  = optional(string)
+      target           = optional(string)
+      task_file_path   = optional(string)
+      task_id          = optional(string)
+      timeout          = optional(number)
+      type             = string
+      values_file_path = optional(string)
+      values = optional(list(object({
+        is_secret = optional(bool)
+        name      = string
+        value     = string
+      })))
+    }))
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_tasks"></a> [tasks](#input\_tasks)
+
+Description: Map of instances for the submodule with the following attributes:
+
+**name**  
+The name of the resource.
+
+**location**  
+The location of the resource.
+
+**agent\_configuration**  
+The machine configuration of the run agent. Includes `cpu` for the number of cores required.
+
+**agent\_pool\_name**  
+The dedicated agent pool for the task.
+
+**credentials**  
+The properties that describes a set of credentials that will be used when this run is invoked.
+
+**is\_system\_task**  
+The value of this property indicates whether the task resource is system task or not.
+
+**log\_template**  
+The template that describes the repository and tag information for run log artifact.
+
+**managed\_identities**  
+Controls the Managed Identity configuration on this resource.
+
+**platform**  
+The platform properties against which the run has to happen. Includes `architecture`, `os`, and `variant`.
+
+**status**  
+The current status of task.
+
+**step**  
+The properties of a task step. Includes type (Docker, EncodedTask, FileTask) and related configuration.
+
+**tags**
+(Optional) Tags of the resource.
+
+**timeout**  
+Run timeout in seconds (300-28800).
+
+**trigger**  
+The properties that describe all triggers for the task, including base image, source, and timer triggers.
+
+**enable\_telemetry**  
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+
+Type:
+
+```hcl
+map(object({
+    agent_configuration = optional(object({
+      cpu = optional(number)
+    }))
+    agent_pool_name = optional(string)
+    credentials = optional(object({
+      custom_registries = optional(map(object({
+        identity = optional(string)
+        password = optional(object({
+          type  = optional(any)
+          value = optional(string)
+        }))
+        user_name = optional(object({
+          type  = optional(any)
+          value = optional(string)
+        }))
+      })))
+      source_registry = optional(object({
+        identity   = optional(string)
+        login_mode = optional(any)
+      }))
+    }))
+    enable_telemetry = optional(bool)
+    is_system_task   = optional(bool)
+    location         = string
+    log_template     = optional(string)
+    managed_identities = optional(object({
+      system_assigned            = optional(bool, false)
+      user_assigned_resource_ids = optional(set(string), [])
+    }))
+    name = string
+    platform = optional(object({
+      architecture = optional(any)
+      os           = any
+      variant      = optional(any)
+    }))
+    status = optional(any)
+    step = optional(object({
+      arguments = optional(list(object({
+        is_secret = optional(bool)
+        name      = string
+        value     = string
+      })))
+      context_access_token   = optional(string)
+      context_path           = optional(string)
+      docker_file_path       = optional(string)
+      encoded_task_content   = optional(string)
+      encoded_values_content = optional(string)
+      image_names            = optional(list(string))
+      is_push_enabled        = optional(bool)
+      no_cache               = optional(bool)
+      target                 = optional(string)
+      task_file_path         = optional(string)
+      type                   = string
+      values = optional(list(object({
+        is_secret = optional(bool)
+        name      = string
+        value     = string
+      })))
+      values_file_path = optional(string)
+    }))
+    tags    = optional(map(string))
+    timeout = optional(number)
+    trigger = optional(object({
+      base_image_trigger = optional(object({
+        base_image_trigger_type     = any
+        name                        = string
+        status                      = optional(any)
+        update_trigger_endpoint     = optional(string)
+        update_trigger_payload_type = optional(any)
+      }))
+      source_triggers = optional(list(object({
+        name = string
+        source_repository = object({
+          branch         = optional(string)
+          repository_url = string
+          source_control_auth_properties = optional(object({
+            expires_in    = optional(number)
+            refresh_token = optional(string)
+            scope         = optional(string)
+            token         = string
+            token_type    = any
+          }))
+          source_control_type = any
+        })
+        source_trigger_events = list(any)
+        status                = optional(any)
+      })))
+      timer_triggers = optional(list(object({
+        name     = string
+        schedule = string
+        status   = optional(any)
+      })))
+    }))
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_tokens"></a> [tokens](#input\_tokens)
 
@@ -673,11 +1485,11 @@ Default: `{}`
 
 ### <a name="input_zone_redundancy"></a> [zone\_redundancy](#input\_zone\_redundancy)
 
-Description: Whether or not zone redundancy is enabled for this container registry
+Description: Specifies whether zone redundancy is enabled for this Container Registry. Possible values are `Enabled` and `Disabled`. Defaults to `Enabled`. Modifying this forces a new resource to be created. Requires Premium SKU.
 
 Type: `any`
 
-Default: `null`
+Default: `"Enabled"`
 
 ## Outputs
 
@@ -771,6 +1583,12 @@ Description: The resource type
 
 The following Modules are called:
 
+### <a name="module_agent_pools"></a> [agent\_pools](#module\_agent\_pools)
+
+Source: ./modules/agent_pools
+
+Version:
+
 ### <a name="module_avm_interfaces"></a> [avm\_interfaces](#module\_avm\_interfaces)
 
 Source: git::https://github.com/Azure/terraform-azure-avm-utl-interfaces.git
@@ -783,15 +1601,69 @@ Source: ./modules/cache_rules
 
 Version:
 
+### <a name="module_connected_registries"></a> [connected\_registries](#module\_connected\_registries)
+
+Source: ./modules/connected_registries
+
+Version:
+
+### <a name="module_credential_sets"></a> [credential\_sets](#module\_credential\_sets)
+
+Source: ./modules/credential_sets
+
+Version:
+
+### <a name="module_export_pipelines"></a> [export\_pipelines](#module\_export\_pipelines)
+
+Source: ./modules/export_pipelines
+
+Version:
+
+### <a name="module_import_pipelines"></a> [import\_pipelines](#module\_import\_pipelines)
+
+Source: ./modules/import_pipelines
+
+Version:
+
+### <a name="module_pipeline_runs"></a> [pipeline\_runs](#module\_pipeline\_runs)
+
+Source: ./modules/pipeline_runs
+
+Version:
+
+### <a name="module_private_link_resources"></a> [private\_link\_resources](#module\_private\_link\_resources)
+
+Source: ./modules/private_link_resources
+
+Version:
+
 ### <a name="module_replications"></a> [replications](#module\_replications)
 
 Source: ./modules/replications
 
 Version:
 
+### <a name="module_runs"></a> [runs](#module\_runs)
+
+Source: ./modules/runs
+
+Version:
+
 ### <a name="module_scope_maps"></a> [scope\_maps](#module\_scope\_maps)
 
 Source: ./modules/scope_maps
+
+Version:
+
+### <a name="module_task_runs"></a> [task\_runs](#module\_task\_runs)
+
+Source: ./modules/task_runs
+
+Version:
+
+### <a name="module_tasks"></a> [tasks](#module\_tasks)
+
+Source: ./modules/tasks
 
 Version:
 

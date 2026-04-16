@@ -63,7 +63,6 @@ module "containerregistry" {
   location  = azurerm_resource_group.this.location
   name      = module.naming.container_registry.name_unique
   parent_id = azurerm_resource_group.this.id
-  sku       = { name = "Premium" }
   private_endpoints = {
     primary = {
       private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
@@ -71,4 +70,5 @@ module "containerregistry" {
     }
   }
   public_network_access = "Disabled"
+  sku                   = { name = "Premium" }
 }

@@ -1,13 +1,3 @@
-output "resource_id" {
-  description = "The ID of the created resource."
-  value       = azapi_resource.this.id
-}
-
-output "name" {
-  description = "The name of the created resource."
-  value       = azapi_resource.this.name
-}
-
 output "api_version" {
   description = "The resource api version"
   value       = try(azapi_resource.this.output.apiVersion, null)
@@ -16,6 +6,16 @@ output "api_version" {
 output "log_artifact" {
   description = "The image description for the log artifact."
   value       = try(azapi_resource.this.output.properties.logArtifact, {})
+}
+
+output "name" {
+  description = "The name of the created resource."
+  value       = azapi_resource.this.name
+}
+
+output "resource_id" {
+  description = "The ID of the created resource."
+  value       = azapi_resource.this.id
 }
 
 output "run_error_message" {
@@ -32,4 +32,3 @@ output "type" {
   description = "The resource type"
   value       = try(azapi_resource.this.output.type, null)
 }
-

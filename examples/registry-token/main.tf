@@ -43,9 +43,6 @@ module "containerregistry" {
   location  = azurerm_resource_group.this.location
   name      = module.naming.container_registry.name_unique
   parent_id = azurerm_resource_group.this.id
-  sku = {
-    name = "Premium"
-  }
   # Create scope maps for different access levels
   scope_maps = {
     readonly = {
@@ -78,6 +75,9 @@ module "containerregistry" {
       ]
       description = "CI/CD pipeline access for specific repositories"
     }
+  }
+  sku = {
+    name = "Premium"
   }
   # Tokens are now a separate variable, referencing scope maps by constructed ARM resource ID
   tokens = {

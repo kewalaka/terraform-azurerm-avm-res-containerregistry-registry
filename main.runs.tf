@@ -2,6 +2,9 @@ module "runs" {
   source   = "./modules/runs"
   for_each = var.runs
 
+  location             = each.value.location
+  name                 = each.value.name
+  parent_id            = azapi_resource.this.id
   agent_configuration  = each.value.agent_configuration
   agent_pool_name      = each.value.agent_pool_name
   create_time          = each.value.create_time
@@ -11,10 +14,7 @@ module "runs" {
   image_update_trigger = each.value.image_update_trigger
   is_archive_enabled   = each.value.is_archive_enabled
   last_updated_time    = each.value.last_updated_time
-  location             = each.value.location
-  name                 = each.value.name
   output_images        = each.value.output_images
-  parent_id            = azapi_resource.this.id
   platform             = each.value.platform
   provisioning_state   = each.value.provisioning_state
   run_id               = each.value.run_id

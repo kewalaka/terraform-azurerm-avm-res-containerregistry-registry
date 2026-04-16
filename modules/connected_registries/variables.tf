@@ -1,88 +1,34 @@
-variable "name" {
-  description = <<DESCRIPTION
-The name of the resource.
-DESCRIPTION
-  type        = string
-}
-
-variable "parent_id" {
-  description = <<DESCRIPTION
-The parent resource ID for this resource.
-DESCRIPTION
-  type        = string
-}
-
 variable "location" {
+  type        = string
   description = <<DESCRIPTION
 The location of the resource.
 DESCRIPTION
-  type        = string
-}
-
-variable "client_token_ids" {
-  description = <<DESCRIPTION
-The list of the ACR token resource IDs used to authenticate clients to the connected registry.
-DESCRIPTION
-  type        = list(string)
-  default     = null
-}
-
-variable "garbage_collection" {
-  description = <<DESCRIPTION
-The garbage collection properties of the connected registry.
-
-- `enabled` - Indicates whether garbage collection is enabled for the connected registry.
-- `schedule` - The cron expression indicating the schedule that the connected registry will run garbage collection.
-
-DESCRIPTION
-  type = object({
-    enabled  = optional(bool)
-    schedule = optional(string)
-  })
-  default = null
-}
-
-variable "logging" {
-  description = <<DESCRIPTION
-The logging properties of the connected registry.
-
-- `audit_log_status` - Indicates whether audit logs are enabled on the connected registry.
-- `log_level` - The verbosity of logs persisted on the connected registry.
-
-DESCRIPTION
-  type = object({
-    audit_log_status = optional(any)
-    log_level        = optional(any)
-  })
-  default = null
-}
-
-variable "login_server" {
-  description = <<DESCRIPTION
-The login server properties of the connected registry.
-
-
-DESCRIPTION
-  type        = object({})
-  default     = null
 }
 
 variable "mode" {
+  type        = any
   description = <<DESCRIPTION
 The mode of the connected registry resource that indicates the permissions of the registry.
 DESCRIPTION
-  type        = any
 }
 
-variable "notifications_list" {
+variable "name" {
+  type        = string
   description = <<DESCRIPTION
-The list of notifications subscription information for the connected registry.
+The name of the resource.
 DESCRIPTION
-  type        = list(string)
-  default     = null
 }
 
 variable "parent" {
+  type = object({
+    id = optional(string)
+    sync_properties = object({
+      message_ttl = string
+      schedule    = optional(string)
+      sync_window = optional(string)
+      token_id    = string
+    })
+  })
   description = <<DESCRIPTION
 The parent of the connected registry.
 
@@ -94,18 +40,87 @@ The parent of the connected registry.
   - `token_id` - The resource ID of the ACR token used to authenticate the connected registry to its parent during sync.
 
 DESCRIPTION
+}
+
+variable "parent_id" {
+  type        = string
+  description = <<DESCRIPTION
+The parent resource ID for this resource.
+DESCRIPTION
+}
+
+variable "client_token_ids" {
+  type        = list(string)
+  default     = null
+  description = <<DESCRIPTION
+The list of the ACR token resource IDs used to authenticate clients to the connected registry.
+DESCRIPTION
+}
+
+variable "enable_telemetry" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+DESCRIPTION
+  nullable    = false
+}
+
+variable "garbage_collection" {
   type = object({
-    id = optional(string)
-    sync_properties = object({
-      message_ttl = string
-      schedule    = optional(string)
-      sync_window = optional(string)
-      token_id    = string
-    })
+    enabled  = optional(bool)
+    schedule = optional(string)
   })
+  default     = null
+  description = <<DESCRIPTION
+The garbage collection properties of the connected registry.
+
+- `enabled` - Indicates whether garbage collection is enabled for the connected registry.
+- `schedule` - The cron expression indicating the schedule that the connected registry will run garbage collection.
+
+DESCRIPTION
+}
+
+variable "logging" {
+  type = object({
+    audit_log_status = optional(any)
+    log_level        = optional(any)
+  })
+  default     = null
+  description = <<DESCRIPTION
+The logging properties of the connected registry.
+
+- `audit_log_status` - Indicates whether audit logs are enabled on the connected registry.
+- `log_level` - The verbosity of logs persisted on the connected registry.
+
+DESCRIPTION
+}
+
+variable "login_server" {
+  type        = object({})
+  default     = null
+  description = <<DESCRIPTION
+The login server properties of the connected registry.
+
+
+DESCRIPTION
+}
+
+variable "notifications_list" {
+  type        = list(string)
+  default     = null
+  description = <<DESCRIPTION
+The list of notifications subscription information for the connected registry.
+DESCRIPTION
 }
 
 variable "registry_sync_result" {
+  type = object({
+    last_successful_sync_end_time = optional(string)
+    last_sync_end_time            = optional(string)
+    last_sync_start_time          = optional(string)
+  })
+  default     = null
   description = <<DESCRIPTION
 The result of the connected registry's most recent sync with its parent.
 
@@ -114,21 +129,4 @@ The result of the connected registry's most recent sync with its parent.
 - `last_sync_start_time` - The time that the connected registry's most recent sync started.
 
 DESCRIPTION
-  type = object({
-    last_successful_sync_end_time = optional(string)
-    last_sync_end_time            = optional(string)
-    last_sync_start_time          = optional(string)
-  })
-  default = null
 }
-
-
-variable "enable_telemetry" {
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
-DESCRIPTION
-  type        = bool
-  default     = true
-  nullable    = false
-}
-

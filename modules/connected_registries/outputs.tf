@@ -1,21 +1,11 @@
-output "resource_id" {
-  description = "The ID of the created resource."
-  value       = azapi_resource.this.id
-}
-
-output "name" {
-  description = "The name of the created resource."
-  value       = azapi_resource.this.name
+output "activation" {
+  description = "The activation properties of the connected registry."
+  value       = try(azapi_resource.this.output.properties.activation, {})
 }
 
 output "api_version" {
   description = "The resource api version"
   value       = try(azapi_resource.this.output.apiVersion, null)
-}
-
-output "activation" {
-  description = "The activation properties of the connected registry."
-  value       = try(azapi_resource.this.output.properties.activation, {})
 }
 
 output "last_activity_time" {
@@ -43,6 +33,11 @@ output "login_server_tls_certificate_location" {
   value       = try(azapi_resource.this.output.properties.loginServer.tls.certificate.location, null)
 }
 
+output "name" {
+  description = "The name of the created resource."
+  value       = azapi_resource.this.name
+}
+
 output "parent_sync_properties_gateway_endpoint" {
   description = "The gateway endpoint used by the connected registry to communicate with its parent."
   value       = try(azapi_resource.this.output.properties.parent.syncProperties.gatewayEndpoint, null)
@@ -53,14 +48,14 @@ output "parent_sync_properties_last_sync_time" {
   value       = try(azapi_resource.this.output.properties.parent.syncProperties.lastSyncTime, null)
 }
 
+output "resource_id" {
+  description = "The ID of the created resource."
+  value       = azapi_resource.this.id
+}
+
 output "status_details" {
   description = "The list of current statuses of the connected registry."
   value       = try(azapi_resource.this.output.properties.statusDetails, [])
-}
-
-output "version" {
-  description = "The current version of ACR runtime on the connected registry."
-  value       = try(azapi_resource.this.output.properties.version, null)
 }
 
 output "system_data" {
@@ -73,3 +68,7 @@ output "type" {
   value       = try(azapi_resource.this.output.type, null)
 }
 
+output "version" {
+  description = "The current version of ACR runtime on the connected registry."
+  value       = try(azapi_resource.this.output.properties.version, null)
+}

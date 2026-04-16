@@ -1,22 +1,3 @@
-variable "sku" {
-  type = object({
-    name = string
-  })
-  default = {
-    name = "Premium"
-  }
-  description = <<DESCRIPTION
-The SKU of the Container Registry. Default is `Premium`.
-
-- `name` - (Required) The SKU name of the Container Registry. Possible values are `Basic`, `Standard` and `Premium`.
-DESCRIPTION
-
-  validation {
-    condition     = contains(["Basic", "Standard", "Premium"], var.sku.name)
-    error_message = "The SKU name must be either `Basic`, `Standard` or `Premium`."
-  }
-}
-
 variable "admin_user_enabled" {
   type        = bool
   default     = false
@@ -198,6 +179,25 @@ variable "role_assignment_mode" {
   description = <<DESCRIPTION
 Determines the registry role assignment mode. Possible values are `RBAC` and `Legacy`.
 DESCRIPTION
+}
+
+variable "sku" {
+  type = object({
+    name = string
+  })
+  default = {
+    name = "Premium"
+  }
+  description = <<DESCRIPTION
+The SKU of the Container Registry. Default is `Premium`.
+
+- `name` - (Required) The SKU name of the Container Registry. Possible values are `Basic`, `Standard` and `Premium`.
+DESCRIPTION
+
+  validation {
+    condition     = contains(["Basic", "Standard", "Premium"], var.sku.name)
+    error_message = "The SKU name must be either `Basic`, `Standard` or `Premium`."
+  }
 }
 
 variable "zone_redundancy" {

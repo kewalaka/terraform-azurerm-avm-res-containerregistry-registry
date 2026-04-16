@@ -1,15 +1,4 @@
 locals {
-  resource_body = {
-    properties = {
-      options = var.options == null ? null : [for item in var.options : item]
-      target = var.target == null ? null : {
-        keyVaultUri       = var.target.key_vault_uri
-        storageAccessMode = var.target.storage_access_mode
-        type              = var.target.type
-        uri               = var.target.uri
-      }
-    }
-  }
   managed_identities = {
     system_assigned_user_assigned = var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0 ? {
       this = {
@@ -28,5 +17,16 @@ locals {
         user_assigned_resource_ids = var.managed_identities.user_assigned_resource_ids
       }
     } : {}
+  }
+  resource_body = {
+    properties = {
+      options = var.options == null ? null : [for item in var.options : item]
+      target = var.target == null ? null : {
+        keyVaultUri       = var.target.key_vault_uri
+        storageAccessMode = var.target.storage_access_mode
+        type              = var.target.type
+        uri               = var.target.uri
+      }
+    }
   }
 }

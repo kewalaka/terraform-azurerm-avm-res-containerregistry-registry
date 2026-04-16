@@ -1,16 +1,11 @@
-output "resource_id" {
-  description = "The ID of the created resource."
-  value       = azapi_resource.this.id
-}
-
-output "name" {
-  description = "The name of the created resource."
-  value       = azapi_resource.this.name
-}
-
 output "api_version" {
   description = "The resource api version"
   value       = try(azapi_resource.this.output.apiVersion, null)
+}
+
+output "creation_date" {
+  description = "The creation date of credential store resource."
+  value       = try(azapi_resource.this.output.properties.creationDate, null)
 }
 
 output "identity_principal_id" {
@@ -23,9 +18,14 @@ output "identity_tenant_id" {
   value       = try(azapi_resource.this.output.identity.tenantId, null)
 }
 
-output "creation_date" {
-  description = "The creation date of credential store resource."
-  value       = try(azapi_resource.this.output.properties.creationDate, null)
+output "name" {
+  description = "The name of the created resource."
+  value       = azapi_resource.this.name
+}
+
+output "resource_id" {
+  description = "The ID of the created resource."
+  value       = azapi_resource.this.id
 }
 
 output "system_data" {
@@ -37,4 +37,3 @@ output "type" {
   description = "The resource type"
   value       = try(azapi_resource.this.output.type, null)
 }
-

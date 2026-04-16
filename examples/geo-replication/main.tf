@@ -43,7 +43,6 @@ module "containerregistry" {
   location  = azurerm_resource_group.this.location
   name      = module.naming.container_registry.name_unique
   parent_id = azurerm_resource_group.this.id
-  sku       = { name = "Premium" }
   replications = {
     australiaeast = {
       name     = "australiaeast"
@@ -63,6 +62,7 @@ module "containerregistry" {
       }
     }
   }
+  sku = { name = "Premium" }
   # australiasoutheast doesn't support zone redundancy for ACR (https://learn.microsoft.com/en-us/azure/container-registry/zone-redundancy#regional-support)
   zone_redundancy = "Disabled"
 }

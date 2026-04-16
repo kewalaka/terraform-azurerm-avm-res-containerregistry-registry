@@ -1,13 +1,13 @@
 resource "azapi_resource" "this" {
-  type      = "Microsoft.ContainerRegistry/registries/agentPools@2025-03-01-preview"
+  location  = var.location
   name      = var.name
   parent_id = var.parent_id
-  location  = var.location
+  type      = "Microsoft.ContainerRegistry/registries/agentPools@2025-03-01-preview"
   body      = local.resource_body
-  tags      = var.tags
   response_export_values = [
     "apiVersion",
     "systemData",
     "type"
   ]
+  tags = var.tags
 }

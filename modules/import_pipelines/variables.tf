@@ -1,46 +1,31 @@
-variable "name" {
-  description = <<DESCRIPTION
-The name of the resource.
-DESCRIPTION
-  type        = string
-}
-
-variable "parent_id" {
-  description = <<DESCRIPTION
-The parent resource ID for this resource.
-DESCRIPTION
-  type        = string
-}
-
 variable "location" {
+  type        = string
   description = <<DESCRIPTION
 The location of the resource.
 DESCRIPTION
+}
+
+variable "name" {
   type        = string
+  description = <<DESCRIPTION
+The name of the resource.
+DESCRIPTION
 }
 
-# tflint-ignore: terraform_unused_declarations
-variable "managed_identities" {
+variable "parent_id" {
+  type        = string
   description = <<DESCRIPTION
-Controls the Managed Identity configuration on this resource.
+The parent resource ID for this resource.
 DESCRIPTION
-  type = object({
-    system_assigned            = optional(bool, false)
-    user_assigned_resource_ids = optional(set(string), [])
-  })
-  default  = {}
-  nullable = false
-}
-
-variable "options" {
-  description = <<DESCRIPTION
-The list of all options configured for the pipeline.
-DESCRIPTION
-  type        = list(any)
-  default     = null
 }
 
 variable "pipeline_source" {
+  type = object({
+    key_vault_uri       = optional(string)
+    storage_access_mode = optional(any)
+    type                = optional(any)
+    uri                 = optional(string)
+  })
   description = <<DESCRIPTION
 The source properties of the import pipeline.
 
@@ -50,15 +35,45 @@ The source properties of the import pipeline.
 - `uri` - The source uri of the import pipeline. When 'AzureStorageBlob': "https://accountName.blob.core.windows.net/containerName/blobName" When 'AzureStorageBlobContainer': "https://accountName.blob.core.windows.net/containerName"
 
 DESCRIPTION
+}
+
+variable "enable_telemetry" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
+DESCRIPTION
+  nullable    = false
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "managed_identities" {
   type = object({
-    key_vault_uri       = optional(string)
-    storage_access_mode = optional(any)
-    type                = optional(any)
-    uri                 = optional(string)
+    system_assigned            = optional(bool, false)
+    user_assigned_resource_ids = optional(set(string), [])
   })
+  default     = {}
+  description = <<DESCRIPTION
+Controls the Managed Identity configuration on this resource.
+DESCRIPTION
+  nullable    = false
+}
+
+variable "options" {
+  type        = list(any)
+  default     = null
+  description = <<DESCRIPTION
+The list of all options configured for the pipeline.
+DESCRIPTION
 }
 
 variable "trigger" {
+  type = object({
+    source_trigger = optional(object({
+      status = any
+    }))
+  })
+  default     = null
   description = <<DESCRIPTION
 The properties that describe the trigger of the import pipeline.
 
@@ -66,21 +81,4 @@ The properties that describe the trigger of the import pipeline.
   - `status` - The current status of the source trigger.
 
 DESCRIPTION
-  type = object({
-    source_trigger = optional(object({
-      status = any
-    }))
-  })
-  default = null
 }
-
-
-variable "enable_telemetry" {
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module. For more information see https://aka.ms/avm/telemetryinfo.
-DESCRIPTION
-  type        = bool
-  default     = true
-  nullable    = false
-}
-

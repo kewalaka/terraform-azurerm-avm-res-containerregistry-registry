@@ -126,7 +126,6 @@ module "containerregistry" {
   location  = azurerm_resource_group.this.location
   name      = module.naming.container_registry.name_unique
   parent_id = azurerm_resource_group.this.id
-  sku       = { name = "Premium" }
   encryption = {
     key_vault_properties = {
       identity       = azurerm_user_assigned_identity.this.client_id
@@ -138,4 +137,5 @@ module "containerregistry" {
     system_assigned            = true
     user_assigned_resource_ids = toset([azurerm_user_assigned_identity.this.id])
   }
+  sku = { name = "Premium" }
 }

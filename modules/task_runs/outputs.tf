@@ -1,13 +1,3 @@
-output "resource_id" {
-  description = "The ID of the created resource."
-  value       = azapi_resource.this.id
-}
-
-output "name" {
-  description = "The name of the created resource."
-  value       = azapi_resource.this.name
-}
-
 output "api_version" {
   description = "The resource api version"
   value       = try(azapi_resource.this.output.apiVersion, null)
@@ -21,6 +11,16 @@ output "identity_principal_id" {
 output "identity_tenant_id" {
   description = "The tenant ID of resource."
   value       = try(azapi_resource.this.output.identity.tenantId, null)
+}
+
+output "name" {
+  description = "The name of the created resource."
+  value       = azapi_resource.this.name
+}
+
+output "resource_id" {
+  description = "The ID of the created resource."
+  value       = azapi_resource.this.id
 }
 
 output "run_result" {
@@ -67,4 +67,3 @@ output "type" {
   description = "The resource type"
   value       = try(azapi_resource.this.output.type, null)
 }
-
