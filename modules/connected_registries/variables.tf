@@ -96,37 +96,10 @@ The logging properties of the connected registry.
 DESCRIPTION
 }
 
-variable "login_server" {
-  type        = object({})
-  default     = null
-  description = <<DESCRIPTION
-The login server properties of the connected registry.
-
-
-DESCRIPTION
-}
-
 variable "notifications_list" {
   type        = list(string)
   default     = null
   description = <<DESCRIPTION
 The list of notifications subscription information for the connected registry.
-DESCRIPTION
-}
-
-variable "registry_sync_result" {
-  type = object({
-    last_successful_sync_end_time = optional(string)
-    last_sync_end_time            = optional(string)
-    last_sync_start_time          = optional(string)
-  })
-  default     = null
-  description = <<DESCRIPTION
-The result of the connected registry's most recent sync with its parent.
-
-- `last_successful_sync_end_time` - The time that the connected registry's most recent successful sync ended.
-- `last_sync_end_time` - The time that the connected registry's most recent sync ended.
-- `last_sync_start_time` - The time that the connected registry's most recent sync started.
-
 DESCRIPTION
 }

@@ -11,7 +11,6 @@ variable "connected_registries" {
       audit_log_status = optional(any)
       log_level        = optional(any)
     }))
-    login_server       = optional(object({}))
     mode               = any
     name               = string
     notifications_list = optional(list(string))
@@ -24,11 +23,6 @@ variable "connected_registries" {
         token_id    = string
       })
     })
-    registry_sync_result = optional(object({
-      last_successful_sync_end_time = optional(string)
-      last_sync_end_time            = optional(string)
-      last_sync_start_time          = optional(string)
-    }))
   }))
   default     = {}
   description = <<DESCRIPTION
@@ -58,13 +52,8 @@ The garbage collection properties of the connected registry.
 **logging**
 The logging properties of the connected registry.
 
-**login_server**
-The login server properties of the connected registry.
-
 **notifications_list**
 The list of notifications subscription information for the connected registry.
 
-**registry_sync_result**
-The result of the connected registry's most recent sync with its parent.
 DESCRIPTION
 }
