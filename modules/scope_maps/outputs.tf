@@ -1,0 +1,35 @@
+output "resource_id" {
+  description = "The ID of the created resource."
+  value       = azapi_resource.this.id
+}
+
+output "name" {
+  description = "The name of the created resource."
+  value       = azapi_resource.this.name
+}
+
+output "api_version" {
+  description = "The resource api version"
+  value       = try(azapi_resource.this.output.apiVersion, null)
+}
+
+output "creation_date" {
+  description = "The creation date of scope map."
+  value       = try(azapi_resource.this.output.properties.creationDate, null)
+}
+
+output "type" {
+  description = "The type of the scope map. E.g. BuildIn scope map."
+  value       = try(azapi_resource.this.output.properties.type, null)
+}
+
+output "system_data" {
+  description = "Azure Resource Manager metadata containing createdBy and modifiedBy information."
+  value       = try(azapi_resource.this.output.systemData, {})
+}
+
+output "type_2" {
+  description = "The resource type"
+  value       = try(azapi_resource.this.output.type, null)
+}
+

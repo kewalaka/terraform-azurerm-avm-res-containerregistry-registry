@@ -1,11 +1,10 @@
 module "scope_maps" {
-  source   = "./modules/scope-map"
-  for_each = var.scope_maps
-
-  actions                 = each.value.actions
-  container_registry_name = azurerm_container_registry.this.name
-  description             = each.value.description
-  name                    = each.value.name
-  resource_group_name     = azurerm_container_registry.this.resource_group_name
-  registry_tokens         = each.value.registry_tokens
+  source           = "./modules/scope_maps"
+  for_each         = var.scope_maps
+  actions          = each.value.actions
+  description      = each.value.description
+  enable_telemetry = each.value.enable_telemetry
+  location         = each.value.location
+  name             = each.value.name
+  parent_id        = azapi_resource.this.id
 }
