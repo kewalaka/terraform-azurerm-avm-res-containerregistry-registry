@@ -1,6 +1,5 @@
 locals {
   resource_body = {
-    name = var.name
     properties = {
       credentials = var.credentials == null ? null : {
         certificates = var.credentials.certificates == null ? null : [for item in var.credentials.certificates : item == null ? null : {

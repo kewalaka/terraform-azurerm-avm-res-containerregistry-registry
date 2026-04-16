@@ -1,6 +1,5 @@
 locals {
   resource_body = {
-    name = var.name
     properties = {
       credentialSetResourceId = var.credential_set_resource_id
       sourceRepository        = var.source_repository

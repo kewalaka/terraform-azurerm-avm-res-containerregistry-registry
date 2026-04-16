@@ -1,6 +1,5 @@
 locals {
   resource_body = {
-    name = var.name
     properties = {
       adminUserEnabled                  = var.admin_user_enabled
       anonymousPullEnabled              = var.anonymous_pull_enabled
@@ -55,7 +54,6 @@ locals {
     sku = var.sku == null ? null : {
       name = var.sku.name
     }
-    tags = var.tags == null ? null : { for k, value in var.tags : k => value }
   }
   managed_identities = {
     system_assigned_user_assigned = var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0 ? {

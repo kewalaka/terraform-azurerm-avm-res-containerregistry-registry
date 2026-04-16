@@ -1,13 +1,19 @@
 terraform {
-  required_version = "~> 1.6"
+  required_version = "~> 1.12"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.7"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 4, < 5.0.0"
     }
   }
 }
+
+provider "azapi" {}
 
 provider "azurerm" {
   skip_provider_registration = true
@@ -34,8 +40,10 @@ resource "azurerm_resource_group" "this" {
 module "containerregistry" {
   source = "../../"
 
-  location = azurerm_resource_group.this.location
-  # source             = "Azure/avm-containerregistry-registry/azurerm"
-  name                = module.naming.container_registry.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+  location  = azurerm_resource_group.this.location
+  name      = module.naming.container_registry.name_unique
+  parent_id = azurerm_resource_group.this.id
+  sku = {
+    name = "Premium"
+  }
 }
