@@ -53,8 +53,13 @@ variable "endpoint_protocol" {
   type        = any
   default     = null
   description = <<DESCRIPTION
-Specifies the connectivity protocol for the registry. Possible values are `IPv4` and `IPv4IPv6` (dual stack). Defaults to `null`.
+Specifies the connectivity protocol for the registry. Possible values are `IPv4` and `IPv4AndIPv6` (dual stack). Defaults to `null`.
 DESCRIPTION
+
+  validation {
+    condition     = var.endpoint_protocol == null ? true : contains(["IPv4", "IPv4AndIPv6"], var.endpoint_protocol)
+    error_message = "The endpoint_protocol must be either `IPv4` or `IPv4AndIPv6`."
+  }
 }
 
 variable "metadata_search" {
@@ -175,9 +180,9 @@ DESCRIPTION
 
 variable "role_assignment_mode" {
   type        = any
-  default     = null
+  default     = "AbacRepositoryPermissions"
   description = <<DESCRIPTION
-Determines the registry role assignment mode. Possible values are `RBAC` and `Legacy`.
+Determines the registry role assignment mode. Possible values are `AbacRepositoryPermissions` and `LegacyRegistryPermissions`.
 DESCRIPTION
 }
 
