@@ -173,3 +173,139 @@ run "lock_invalid_kind" {
     var.lock,
   ]
 }
+
+# Test 9: Webhooks configuration
+run "webhooks_configuration" {
+  command = apply
+
+  variables {
+    webhooks = {
+      push_webhook = {
+        name        = "pushwebhook"
+        location    = "eastus"
+        service_uri = "https://example.com/webhook"
+        actions     = ["push"]
+        service_uri_version = 1
+      }
+    }
+  }
+
+  assert {
+    condition     = length(module.webhooks) == 1
+    error_message = "Should create exactly one webhook."
+  }
+}
+
+# Test 10: Cache rules configuration
+run "cache_rules_configuration" {
+  command = apply
+
+  variables {
+    cache_rules = {
+      nginx = {
+        name              = "nginx-cache"
+        location          = "eastus"
+        source_repository = "docker.io/library/nginx"
+        target_repository = "nginx"
+      }
+    }
+  }
+
+  assert {
+    condition     = length(module.cache_rules) == 1
+    error_message = "Should create exactly one cache rule."
+  }
+}
+
+# Test 11: Replications configuration
+run "replications_configuration" {
+  command = apply
+
+  variables {
+    replications = {
+      westus = {
+        name     = "westus"
+        location = "westus"
+      }
+    }
+  }
+
+  assert {
+    condition     = length(module.replications) == 1
+    error_message = "Should create exactly one replication."
+  }
+}
+
+# Test 12: Scope maps and tokens
+run "scope_maps_configuration" {
+  command = apply
+
+  variables {
+    scope_maps = {
+      readonly = {
+        name     = "readonly-scope"
+        location = "eastus"
+        actions  = ["repositories/*/content/read"]
+      }
+    }
+  }
+
+  assert {
+    condition     = length(module.scope_maps) == 1
+    error_message = "Should create exactly one scope map."
+  }
+}
+
+# Test 13: endpoint_protocol validation - valid value
+run "endpoint_protocol_valid" {
+  command = plan
+
+  variables {
+    endpoint_protocol = "IPv4AndIPv6"
+  }
+
+  assert {
+    condition     = azapi_resource.this.name == "testacr"
+    error_message = "Registry should accept valid endpoint protocol."
+  }
+}
+
+# Test 14: endpoint_protocol validation - invalid value should fail
+run "endpoint_protocol_invalid" {
+  command = plan
+
+  variables {
+    endpoint_protocol = "IPv6Only"
+  }
+
+  expect_failures = [
+    var.endpoint_protocol,
+  ]
+}
+
+# Test 15: network_rule_bypass_options validation - valid value
+run "network_rule_bypass_options_valid" {
+  command = plan
+
+  variables {
+    network_rule_bypass_options = "AzureServices"
+  }
+
+  assert {
+    condition     = azapi_resource.this.name == "testacr"
+    error_message = "Registry should accept valid network rule bypass options."
+  }
+}
+
+# Test 16: network_rule_bypass_options validation - invalid value should fail
+run "network_rule_bypass_options_invalid" {
+  command = plan
+
+  variables {
+    network_rule_bypass_options = "InvalidOption"
+  }
+
+  expect_failures = [
+    var.network_rule_bypass_options,
+  ]
+}
