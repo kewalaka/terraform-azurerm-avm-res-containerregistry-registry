@@ -1,6 +1,36 @@
+output "data_endpoint_host_names" {
+  description = "List of host names that will serve data when dataEndpointEnabled is true."
+  value       = try(azapi_resource.this.output.properties.dataEndpointHostNames, [])
+}
+
+output "encryption_key_vault_properties_key_rotation_enabled" {
+  description = "Auto key rotation status for a CMK enabled registry."
+  value       = try(azapi_resource.this.output.properties.encryption.keyVaultProperties.keyRotationEnabled, null)
+}
+
+output "encryption_key_vault_properties_versioned_key_identifier" {
+  description = "The fully qualified key identifier that includes the version of the key that is actually used for encryption."
+  value       = try(azapi_resource.this.output.properties.encryption.keyVaultProperties.versionedKeyIdentifier, null)
+}
+
+output "identity_principal_id" {
+  description = "The principal ID of resource identity."
+  value       = try(azapi_resource.this.output.identity.principalId, null)
+}
+
+output "identity_tenant_id" {
+  description = "The tenant ID of resource."
+  value       = try(azapi_resource.this.output.identity.tenantId, null)
+}
+
+output "login_server" {
+  description = "The URL that can be used to log into the container registry."
+  value       = try(azapi_resource.this.output.properties.loginServer, null)
+}
+
 output "name" {
-  description = "The name of the parent resource."
-  value       = azurerm_container_registry.this.name
+  description = "The name of the created resource."
+  value       = azapi_resource.this.name
 }
 
 output "private_endpoints" {
@@ -8,36 +38,24 @@ output "private_endpoints" {
   value       = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this : azurerm_private_endpoint.this_unmanaged_dns_zone_groups
 }
 
-# Module owners should include the full resource via a 'resource' output
-# https://azure.github.io/Azure-Verified-Modules/specs/terraform/#id-tffr2---category-outputs---additional-terraform-outputs
-output "resource" {
-  description = "This is the full output for the resource."
-  value       = azurerm_container_registry.this
+output "regional_endpoint_host_names" {
+  description = "List of host names that will serve registry when RegionalEndpoints is enabled."
+  value       = try(azapi_resource.this.output.properties.regionalEndpointHostNames, [])
 }
 
-# Minimum required outputs
-# https://azure.github.io/Azure-Verified-Modules/specs/shared/#id-rmfr7---category-outputs---minimum-required-outputs
 output "resource_id" {
-  description = "The resource id for the parent resource."
-  value       = azurerm_container_registry.this.id
+  description = "The ID of the created resource."
+  value       = azapi_resource.this.id
 }
 
 output "scope_maps" {
   description = <<DESCRIPTION
 A map of scope maps. The map key is the supplied input to var.scope_maps. The map value is the entire scope map module.
-The scope map module contains the following outputs:
-- `id` - The ID of the Container Registry Scope Map.
-- `registry_tokens` - The registry token object.
-  - `id` - The ID of the Container Registry token.
-  - `registry_token_passwords` - The registry token password object.
-    - `id` - The ID of the Container Registry token password.
-    - `password1` - The first password object of the token.
-    - `password2` - The second password object of the token.
 DESCRIPTION
   value       = module.scope_maps
 }
 
 output "system_assigned_mi_principal_id" {
   description = "The system assigned managed identity principal ID of the parent resource."
-  value       = try(azurerm_container_registry.this.identity[0].principal_id, null)
+  value       = try(azapi_resource.this.output.identity.principalId, null)
 }

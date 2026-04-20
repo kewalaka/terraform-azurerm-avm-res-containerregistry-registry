@@ -1,43 +1,21 @@
 variable "location" {
   type        = string
-  description = "Azure region where the resource should be deployed."
-  nullable    = false
+  description = <<DESCRIPTION
+The location of the resource.
+DESCRIPTION
 }
 
 variable "name" {
   type        = string
-  description = "The name of the Container Registry."
-
-  validation {
-    condition     = can(regex("^[[:alnum:]]{5,50}$", var.name))
-    error_message = "The name must be between 5 and 50 characters long and can only contain letters and numbers."
-  }
-}
-
-# This is required for most resource modules
-variable "resource_group_name" {
-  type        = string
-  description = "The resource group where the resources will be deployed."
-}
-
-variable "customer_managed_key" {
-  type = object({
-    key_vault_resource_id = string
-    key_name              = string
-    key_version           = optional(string, null)
-    user_assigned_identity = optional(object({
-      resource_id = string
-    }), null)
-  })
-  default     = null
   description = <<DESCRIPTION
-A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-Controls the Customer managed key configuration on this resource. The following properties can be specified:
-- `key_vault_resource_id` - (Required) Resource ID of the Key Vault that the customer managed key belongs to.
-- `key_name` - (Required) Specifies the name of the Customer Managed Key Vault Key.
-- `key_version` - (Optional) The version of the Customer Managed Key Vault Key.
-- `user_assigned_identity` - (Optional) The User Assigned Identity that has access to the key.
-  - `resource_id` - (Required) The resource ID of the User Assigned Identity that has access to the key.
+The name of the resource.
+DESCRIPTION
+}
+
+variable "parent_id" {
+  type        = string
+  description = <<DESCRIPTION
+The parent resource ID for this resource.
 DESCRIPTION
 }
 
@@ -57,7 +35,7 @@ variable "diagnostic_settings" {
   default     = {}
   description = <<DESCRIPTION
   A map of diagnostic settings to create on the Container Registry. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  
+
   - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
   - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
   - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
@@ -97,12 +75,6 @@ DESCRIPTION
   nullable    = false
 }
 
-variable "enable_trust_policy" {
-  type        = bool
-  default     = false
-  description = "Specified whether trust policy is enabled for this Container Registry."
-}
-
 variable "lock" {
   type = object({
     kind = string
@@ -112,7 +84,7 @@ variable "lock" {
   description = <<DESCRIPTION
 Controls the Resource Lock configuration for this resource. The following properties can be specified:
 
-- `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+- `kind` - (Required) The type of lock. Possible values are `"CanNotDelete"` and `"ReadOnly"`.
 - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
 DESCRIPTION
 
@@ -122,6 +94,7 @@ DESCRIPTION
   }
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "managed_identities" {
   type = object({
     system_assigned            = optional(bool, false)
@@ -129,10 +102,7 @@ variable "managed_identities" {
   })
   default     = {}
   description = <<DESCRIPTION
-Controls the Managed Identity configuration on this resource. The following properties can be specified:
-
-- `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
-- `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+Controls the Managed Identity configuration on this resource.
 DESCRIPTION
   nullable    = false
 }
@@ -174,22 +144,12 @@ A map of private endpoints to create on the Container Registry. The map key is d
 
 - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
 - `role_assignments` - (Optional) A map of role assignments to create on the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time. See `var.role_assignments` for more information.
-  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
-  - `principal_id` - The ID of the principal to assign the role to.
-  - `description` - (Optional) The description of the role assignment.
-  - `skip_service_principal_aad_check` - (Optional) If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
-  - `condition` - (Optional) The condition which will be used to scope the role assignment.
-  - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
-  - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
-  - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
 - `lock` - (Optional) The lock level to apply to the private endpoint. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
-  - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
-  - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
 - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
 - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
 - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
 - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
-- `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+- `application_security_group_associations` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
 - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
 - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
@@ -221,7 +181,7 @@ variable "role_assignments" {
   }))
   default     = {}
   description = <<DESCRIPTION
-A map of role assignments to create on the <RESOURCE>. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+A map of role assignments to create on the resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
 - `principal_id` - The ID of the principal to assign the role to.
@@ -237,8 +197,11 @@ DESCRIPTION
   nullable    = false
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "tags" {
   type        = map(string)
   default     = null
-  description = "(Optional) Tags of the resource."
+  description = <<DESCRIPTION
+(Optional) Tags of the resource.
+DESCRIPTION
 }

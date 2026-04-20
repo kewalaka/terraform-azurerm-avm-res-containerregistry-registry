@@ -4,7 +4,7 @@ resource "azurerm_private_endpoint" "this" {
 
   location                      = coalesce(each.value.location, var.location)
   name                          = each.value.name != null ? each.value.name : "pe-${var.name}"
-  resource_group_name           = each.value.resource_group_name != null ? each.value.resource_group_name : var.resource_group_name
+  resource_group_name           = each.value.resource_group_name != null ? each.value.resource_group_name : split("/", var.parent_id)[4]
   subnet_id                     = each.value.subnet_resource_id
   custom_network_interface_name = each.value.network_interface_name
   tags                          = each.value.tags
@@ -12,7 +12,7 @@ resource "azurerm_private_endpoint" "this" {
   private_service_connection {
     is_manual_connection           = false
     name                           = each.value.private_service_connection_name != null ? each.value.private_service_connection_name : "pse-${var.name}"
-    private_connection_resource_id = azurerm_container_registry.this.id
+    private_connection_resource_id = azapi_resource.this.id
     subresource_names              = ["registry"]
   }
   dynamic "ip_configuration" {
@@ -41,7 +41,7 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
 
   location                      = coalesce(each.value.location, var.location)
   name                          = each.value.name != null ? each.value.name : "pe-${var.name}"
-  resource_group_name           = each.value.resource_group_name != null ? each.value.resource_group_name : var.resource_group_name
+  resource_group_name           = each.value.resource_group_name != null ? each.value.resource_group_name : split("/", var.parent_id)[4]
   subnet_id                     = each.value.subnet_resource_id
   custom_network_interface_name = each.value.network_interface_name
   tags                          = each.value.tags
@@ -49,7 +49,7 @@ resource "azurerm_private_endpoint" "this_unmanaged_dns_zone_groups" {
   private_service_connection {
     is_manual_connection           = false
     name                           = each.value.private_service_connection_name != null ? each.value.private_service_connection_name : "pse-${var.name}"
-    private_connection_resource_id = azurerm_container_registry.this.id
+    private_connection_resource_id = azapi_resource.this.id
     subresource_names              = ["registry"]
   }
   dynamic "ip_configuration" {
@@ -72,5 +72,5 @@ resource "azurerm_private_endpoint_application_security_group_association" "this
   for_each = local.private_endpoint_application_security_group_associations
 
   application_security_group_id = each.value.asg_resource_id
-  private_endpoint_id           = azurerm_private_endpoint.this[each.value.pe_key].id
+  private_endpoint_id           = var.private_endpoints_manage_dns_zone_group ? azurerm_private_endpoint.this[each.value.pe_key].id : azurerm_private_endpoint.this_unmanaged_dns_zone_groups[each.value.pe_key].id
 }

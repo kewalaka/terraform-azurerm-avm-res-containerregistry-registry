@@ -6,19 +6,22 @@ This deploys the Container Registry module with customer-managed-key encryption
 
 ```hcl
 terraform {
-  required_version = "~> 1.6"
+  required_version = "~> 1.12"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.7"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 4, < 5.0.0"
-
     }
   }
 }
 
 provider "azurerm" {
-  skip_provider_registration = true
+  resource_provider_registrations = "none"
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -29,6 +32,8 @@ provider "azurerm" {
     }
   }
 }
+
+provider "azapi" {}
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
@@ -125,21 +130,21 @@ resource "azurerm_key_vault_key" "key" {
 module "containerregistry" {
   source = "../../"
 
-  location = azurerm_resource_group.this.location
-  # source             = "Azure/avm-containerregistry-registry/azurerm"
-  name                = module.naming.container_registry.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  customer_managed_key = {
-    key_vault_resource_id = azurerm_key_vault.this.id
-    key_name              = azurerm_key_vault_key.key.name
-    user_assigned_identity = {
-      resource_id = azurerm_user_assigned_identity.this.id
+  location  = azurerm_resource_group.this.location
+  name      = module.naming.container_registry.name_unique
+  parent_id = azurerm_resource_group.this.id
+  encryption = {
+    key_vault_properties = {
+      identity       = azurerm_user_assigned_identity.this.client_id
+      key_identifier = azurerm_key_vault_key.key.id
     }
+    status = "enabled"
   }
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = toset([azurerm_user_assigned_identity.this.id])
   }
+  sku = { name = "Premium" }
 }
 ```
 
@@ -148,7 +153,9 @@ module "containerregistry" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.12)
+
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.7)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4, < 5.0.0)
 

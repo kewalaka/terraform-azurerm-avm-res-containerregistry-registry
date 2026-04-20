@@ -1,158 +1,219 @@
-variable "admin_enabled" {
+variable "admin_user_enabled" {
   type        = bool
   default     = false
-  description = "Specifies whether the admin user is enabled. Defaults to `false`."
+  description = <<DESCRIPTION
+Specifies whether the admin user is enabled. Defaults to `false`. The admin account is a single user account with admin access to the registry, avoid using this for production workloads.
+DESCRIPTION
 }
 
 variable "anonymous_pull_enabled" {
   type        = bool
   default     = false
-  description = "Specifies whether anonymous (unauthenticated) pull access to this Container Registry is allowed.  Requries Standard or Premium SKU."
+  description = <<DESCRIPTION
+Specifies whether anonymous (unauthenticated) pull access to this Container Registry is allowed. Requires Standard or Premium SKU. Defaults to `false`.
+DESCRIPTION
+}
+
+variable "auto_generated_domain_name_label_scope" {
+  type        = any
+  default     = null
+  description = <<DESCRIPTION
+Determines the domain name label reuse scope. Possible values include `TenantReuse`, `SubscriptionReuse`, `ResourceGroupReuse`, `NoReuse`, and `Unsecure`.
+DESCRIPTION
 }
 
 variable "data_endpoint_enabled" {
   type        = bool
   default     = false
-  description = "Specifies whether to enable dedicated data endpoints for this Container Registry.  Requires Premium SKU."
-}
-
-variable "export_policy_enabled" {
-  type        = bool
-  default     = true
-  description = "Specifies whether export policy is enabled. Defaults to true. In order to set it to false, make sure the public_network_access_enabled is also set to false."
-}
-
-variable "georeplications" {
-  type = list(object({
-    location                  = string
-    regional_endpoint_enabled = optional(bool, true)
-    zone_redundancy_enabled   = optional(bool, true)
-    tags                      = optional(map(any), null)
-  }))
-  default     = []
   description = <<DESCRIPTION
-A list of geo-replication configurations for the Container Registry.
-
-- `location` - (Required) The geographic location where the Container Registry should be geo-replicated.
-- `regional_endpoint_enabled` - (Optional) Enables or disables regional endpoint. Defaults to `true`.
-- `zone_redundancy_enabled` - (Optional) Enables or disables zone redundancy. Defaults to `true`.
-- `tags` - (Optional) A map of additional tags for the geo-replication configuration. Defaults to `null`.
-
+Specifies whether to enable dedicated data endpoints for this Container Registry. Requires Premium SKU. Defaults to `false`.
 DESCRIPTION
 }
 
-variable "network_rule_bypass_option" {
-  type        = string
-  default     = "None"
+variable "encryption" {
+  type = object({
+    key_vault_properties = optional(object({
+      identity       = optional(string)
+      key_identifier = optional(string)
+    }))
+    status = optional(any)
+  })
+  default     = null
   description = <<DESCRIPTION
-Specifies whether to allow trusted Azure services access to a network restricted Container Registry.
-Possible values are `None` and `AzureServices`. Defaults to `None`.
+The encryption settings for the Container Registry using a customer-managed key. Requires Premium SKU.
+
+- `key_vault_properties` - (Optional) Key vault properties for the encryption key.
+  - `identity` - (Optional) The client ID of the managed identity used to access the key vault.
+  - `key_identifier` - (Optional) The full URI of the encryption key in the key vault, e.g. `https://myvault.vault.azure.net/keys/mykey/myversion`.
+- `status` - (Optional) Indicates whether encryption is enabled. Possible values are `enabled` and `disabled`.
+DESCRIPTION
+}
+
+variable "endpoint_protocol" {
+  type        = any
+  default     = null
+  description = <<DESCRIPTION
+Specifies the connectivity protocol for the registry. Possible values are `IPv4` and `IPv4AndIPv6` (dual stack). Defaults to `null`.
 DESCRIPTION
 
   validation {
-    condition     = var.network_rule_bypass_option == null ? true : contains(["AzureServices", "None"], var.network_rule_bypass_option)
-    error_message = "The network_rule_bypass_option variable must be either `AzureServices` or `None`."
+    condition     = var.endpoint_protocol == null ? true : contains(["IPv4", "IPv4AndIPv6"], var.endpoint_protocol)
+    error_message = "The endpoint_protocol must be either `IPv4` or `IPv4AndIPv6`."
+  }
+}
+
+variable "metadata_search" {
+  type        = any
+  default     = null
+  description = <<DESCRIPTION
+Specifies whether registry artifacts are indexed for metadata search. Possible values are `Enabled` and `Disabled`. Requires Premium SKU.
+DESCRIPTION
+}
+
+variable "network_rule_bypass_allowed_for_tasks" {
+  type        = bool
+  default     = null
+  description = <<DESCRIPTION
+Specifies whether to allow trusted Azure Services to access a network restricted Container Registry for tasks such as image build. Defaults to `null`.
+DESCRIPTION
+}
+
+variable "network_rule_bypass_options" {
+  type        = any
+  default     = "None"
+  description = <<DESCRIPTION
+Specifies whether to allow trusted Azure services access to a network restricted Container Registry. Possible values are `None` and `AzureServices`. Defaults to `None`.
+DESCRIPTION
+
+  validation {
+    condition     = var.network_rule_bypass_options == null ? true : contains(["AzureServices", "None"], var.network_rule_bypass_options)
+    error_message = "The network_rule_bypass_options variable must be either `AzureServices` or `None`."
   }
 }
 
 variable "network_rule_set" {
   type = object({
-    default_action = optional(string, "Deny")
-    ip_rule = optional(list(object({
-      # since the `action` property only permits `Allow`, this is hard-coded.
-      action   = optional(string, "Allow")
-      ip_range = string
-    })), [])
+    default_action = any
+    ip_rules = optional(list(object({
+      action = optional(any)
+      value  = string
+    })))
   })
   default     = null
   description = <<DESCRIPTION
-The network rule set configuration for the Container Registry.
-Requires Premium SKU.
+The network rule set configuration for the Container Registry. Requires Premium SKU.
 
-- `default_action` - (Optional) The default action when no rule matches. Possible values are `Allow` and `Deny`. Defaults to `Deny`.
-- `ip_rules` - (Optional) A list of IP rules in CIDR format. Defaults to `[]`.
-  - `action` - Only "Allow" is permitted
-  - `ip_range` - The CIDR block from which requests will match the rule.
+- `default_action` - (Required) The default action when no other rules match. Possible values are `Allow` and `Deny`.
+- `ip_rules` - (Optional) A list of IP ACL rules.
+  - `action` - (Optional) The action of the IP rule. Only `Allow` is permitted.
+  - `value` - (Required) The CIDR block from which requests will match the rule.
+DESCRIPTION
+}
 
+variable "policies" {
+  type = object({
+    azure_ad_authentication_as_arm_policy = optional(object({
+      status = optional(any)
+    }))
+    export_policy = optional(object({
+      status = optional(any)
+    }))
+    quarantine_policy = optional(object({
+      status = optional(any)
+    }))
+    retention_policy = optional(object({
+      days   = optional(number)
+      status = optional(any)
+    }))
+    soft_delete_policy = optional(object({
+      retention_days = optional(number)
+      status         = optional(any)
+    }))
+    trust_policy = optional(object({
+      status = optional(any)
+      type   = optional(any)
+    }))
+  })
+  default     = null
+  description = <<DESCRIPTION
+The policies for the Container Registry. All sub-policies require Premium SKU.
+
+- `azure_ad_authentication_as_arm_policy` - The policy for using Azure Resource Manager audience token for a container registry.
+  - `status` - The value that indicates whether the policy is enabled or not.
+- `export_policy` - The export policy for a container registry.
+  - `status` - The value that indicates whether the policy is enabled or not.
+- `quarantine_policy` - The quarantine policy for a container registry.
+  - `status` - The value that indicates whether the policy is enabled or not.
+- `retention_policy` - The retention policy for a container registry.
+  - `days` - The number of days to retain an untagged manifest after which it gets purged.
+  - `status` - The value that indicates whether the policy is enabled or not.
+- `soft_delete_policy` - The soft delete policy for a container registry.
+  - `retention_days` - The number of days after which a soft-deleted item is permanently deleted.
+  - `status` - The value that indicates whether the policy is enabled or not.
+- `trust_policy` - The content trust policy for a container registry.
+  - `status` - The value that indicates whether the policy is enabled or not.
+  - `type` - The type of trust policy.
+
+DESCRIPTION
+}
+
+variable "public_network_access" {
+  type        = any
+  default     = null
+  description = <<DESCRIPTION
+Specifies whether public network access is permitted for the Container Registry. Possible values are `Enabled` and `Disabled`.
 DESCRIPTION
 
   validation {
-    condition     = var.network_rule_set == null ? true : contains(["Allow", "Deny"], var.network_rule_set.default_action)
-    error_message = "The default_action value must be either `Allow` or `Deny`."
+    condition     = var.public_network_access == null ? true : contains(["Enabled", "Disabled"], var.public_network_access)
+    error_message = "The public_network_access value must be either `Enabled` or `Disabled`."
   }
 }
 
-variable "public_network_access_enabled" {
-  type        = bool
-  default     = true
-  description = "Specifies whether public access is permitted."
-}
-
-variable "quarantine_policy_enabled" {
-  type        = bool
-  default     = false
-  description = "Specifies whether the quarantine policy is enabled."
-}
-
-variable "retention_policy_in_days" {
-  type        = number
-  default     = 7
+variable "regional_endpoints" {
+  type        = any
+  default     = null
   description = <<DESCRIPTION
-If enabled, this retention policy will purge an untagged manifest after a specified number of days.
-
-- `days` - (Optional) The number of days before the policy Defaults to 7 days.
-
+Specifies whether per-region endpoints are enabled for accessing the registry. Possible values are `Enabled` and `Disabled`.
 DESCRIPTION
 }
 
-variable "scope_maps" {
-  type = map(object({
-    name        = string
-    actions     = list(string)
-    description = optional(string, null)
-    registry_tokens = optional(map(object({
-      name    = string
-      enabled = optional(bool, true)
-      passwords = optional(object({
-        password1 = object({
-          expiry = optional(string)
-        })
-        password2 = optional(object({
-          expiry = optional(string)
-        }))
-      }))
-    })))
-  }))
-  default     = {}
+variable "role_assignment_mode" {
+  type        = any
+  default     = "AbacRepositoryPermissions"
   description = <<DESCRIPTION
-A map of scope maps to create on the Container Registry. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-- `name` - The name of the scope map.
-- `actions` - A list of actions that this scope map can perform. Example: "repo/content/read", "repo2/content/delete"
-- `description` - The description of the scope map.
-- `registry_tokens` - A map of Azure Container Registry token associated to a scope map. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  - `name` - Specifies the name of the token.
-  - `enabled` - Should the Container Registry token be enabled? Defaults to true.
-  - `passwords` - The passwords of the token. The first password is required, the second password is optional.
-    - `password1` - The first password of the token.
-      - `expiry` - The expiry date of the first password. If not specified, the password will not expire.
-    - `password2` - The second password of the token.
-      - `expiry` - The expiry date of the second password. If not specified, the password will not expire.
+Determines the registry role assignment mode. Possible values are `AbacRepositoryPermissions` and `LegacyRegistryPermissions`.
 DESCRIPTION
 }
 
 variable "sku" {
-  type        = string
-  default     = "Premium"
-  description = "The SKU name of the Container Registry. Default is `Premium`. `Possible values are `Basic`, `Standard` and `Premium`."
+  type = object({
+    name = string
+  })
+  default = {
+    name = "Premium"
+  }
+  description = <<DESCRIPTION
+The SKU of the Container Registry. Default is `Premium`.
+
+- `name` - (Required) The SKU name of the Container Registry. Possible values are `Basic`, `Standard` and `Premium`.
+DESCRIPTION
 
   validation {
-    condition     = contains(["Basic", "Standard", "Premium"], var.sku)
+    condition     = contains(["Basic", "Standard", "Premium"], var.sku.name)
     error_message = "The SKU name must be either `Basic`, `Standard` or `Premium`."
   }
 }
 
-variable "zone_redundancy_enabled" {
-  type        = bool
-  default     = true
-  description = "Specifies whether zone redundancy is enabled.  Modifying this forces a new resource to be created."
+variable "zone_redundancy" {
+  type        = any
+  default     = "Enabled"
+  description = <<DESCRIPTION
+Specifies whether zone redundancy is enabled for this Container Registry. Possible values are `Enabled` and `Disabled`. Defaults to `Enabled`. Modifying this forces a new resource to be created. Requires Premium SKU.
+DESCRIPTION
+
+  validation {
+    condition     = var.zone_redundancy == null ? true : contains(["Enabled", "Disabled"], var.zone_redundancy)
+    error_message = "The zone_redundancy value must be either `Enabled` or `Disabled`."
+  }
 }
