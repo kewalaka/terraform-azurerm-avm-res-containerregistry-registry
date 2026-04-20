@@ -8,21 +8,14 @@ resource "azapi_resource" "this" {
   delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   response_export_values = [
-    "apiVersion",
     "identity.principalId",
     "identity.tenantId",
-    "properties.creationDate",
     "properties.dataEndpointHostNames",
     "properties.encryption.keyVaultProperties.keyRotationEnabled",
     "properties.encryption.keyVaultProperties.versionedKeyIdentifier",
     "properties.loginServer",
-    "properties.policies.retentionPolicy.lastUpdatedTime",
-    "properties.policies.softDeletePolicy.lastUpdatedTime",
     "properties.privateEndpointConnections",
-    "properties.regionalEndpointHostNames",
-    "properties.status",
-    "systemData",
-    "type"
+    "properties.regionalEndpointHostNames"
   ]
   tags           = var.tags
   update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
