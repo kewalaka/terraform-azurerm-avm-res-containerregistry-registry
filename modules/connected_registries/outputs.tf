@@ -3,11 +3,6 @@ output "activation" {
   value       = try(azapi_resource.this.output.properties.activation, {})
 }
 
-output "api_version" {
-  description = "The resource api version"
-  value       = try(azapi_resource.this.output.apiVersion, null)
-}
-
 output "last_activity_time" {
   description = "The last activity time of the connected registry."
   value       = try(azapi_resource.this.output.properties.lastActivityTime, null)
@@ -56,16 +51,6 @@ output "resource_id" {
 output "status_details" {
   description = "The list of current statuses of the connected registry."
   value       = try(azapi_resource.this.output.properties.statusDetails, [])
-}
-
-output "system_data" {
-  description = "Azure Resource Manager metadata containing createdBy and modifiedBy information."
-  value       = try(azapi_resource.this.output.systemData, {})
-}
-
-output "type" {
-  description = "The resource type"
-  value       = try(azapi_resource.this.output.type, null)
 }
 
 output "version" {

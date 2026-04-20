@@ -4,7 +4,6 @@ resource "azapi_resource" "this" {
   type      = "Microsoft.ContainerRegistry/registries/connectedRegistries@2026-01-01-preview"
   body      = local.resource_body
   response_export_values = [
-    "apiVersion",
     "properties.activation",
     "properties.lastActivityTime",
     "properties.loginServer.host",
@@ -14,8 +13,6 @@ resource "azapi_resource" "this" {
     "properties.parent.syncProperties.gatewayEndpoint",
     "properties.parent.syncProperties.lastSyncTime",
     "properties.statusDetails",
-    "properties.version",
-    "systemData",
-    "type"
+    "properties.version"
   ]
 }

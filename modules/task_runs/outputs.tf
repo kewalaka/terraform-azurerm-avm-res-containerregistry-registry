@@ -1,8 +1,3 @@
-output "api_version" {
-  description = "The resource api version"
-  value       = try(azapi_resource.this.output.apiVersion, null)
-}
-
 output "identity_principal_id" {
   description = "The principal ID of resource identity."
   value       = try(azapi_resource.this.output.identity.principalId, null)
@@ -56,14 +51,4 @@ output "run_result_system_data" {
 output "run_result_type" {
   description = "The type of the resource. E.g. \"Microsoft.Compute/virtualMachines\" or \"Microsoft.Storage/storageAccounts\""
   value       = try(azapi_resource.this.output.properties.runResult.type, null)
-}
-
-output "system_data" {
-  description = "Azure Resource Manager metadata containing createdBy and modifiedBy information."
-  value       = try(azapi_resource.this.output.systemData, {})
-}
-
-output "type" {
-  description = "The resource type"
-  value       = try(azapi_resource.this.output.type, null)
 }

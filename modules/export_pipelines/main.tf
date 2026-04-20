@@ -5,11 +5,8 @@ resource "azapi_resource" "this" {
   type      = "Microsoft.ContainerRegistry/registries/exportPipelines@2026-01-01-preview"
   body      = local.resource_body
   response_export_values = [
-    "apiVersion",
     "identity.principalId",
-    "identity.tenantId",
-    "systemData",
-    "type"
+    "identity.tenantId"
   ]
 
   dynamic "identity" {

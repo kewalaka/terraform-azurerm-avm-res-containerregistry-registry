@@ -5,13 +5,9 @@ resource "azapi_resource" "this" {
   type      = "Microsoft.ContainerRegistry/registries/tasks@2025-03-01-preview"
   body      = local.resource_body
   response_export_values = [
-    "apiVersion",
     "identity.principalId",
     "identity.tenantId",
-    "properties.creationDate",
-    "properties.step.baseImageDependencies",
-    "systemData",
-    "type"
+    "properties.step.baseImageDependencies"
   ]
   # Disabled because the body contains a discriminated object type whose
   # discriminator property value is unknown at validate time.

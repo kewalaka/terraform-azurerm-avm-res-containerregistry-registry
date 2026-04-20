@@ -4,12 +4,8 @@ resource "azapi_resource" "this" {
   type      = "Microsoft.ContainerRegistry/registries/cacheRules@2026-01-01-preview"
   body      = local.resource_body
   response_export_values = [
-    "apiVersion",
     "identity.principalId",
-    "identity.tenantId",
-    "properties.creationDate",
-    "systemData",
-    "type"
+    "identity.tenantId"
   ]
 
   dynamic "identity" {
